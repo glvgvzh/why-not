@@ -1,10 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+      <Text>WhyNot</Text>
+      <View>
+        <Text>Квест дня</Text>
+        <Text>Пройди сегодня новым маршрутом</Text>
+        <Text>Сверни с привычной дороги и исследуй что-то новое</Text>
+        <Pressable>
+          <Text>Выполнить</Text>
+        </Pressable>
+        <Pressable>
+          <Text>Заменить</Text>
+        </Pressable>
+        <Pressable>
+          <Text>Пропустить</Text>
+        </Pressable>
+      </View>
       <StatusBar style="auto" />
     </View>
   );
