@@ -3,12 +3,13 @@ import { Pressable, StyleSheet, Text, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } from '@expo-google-fonts/manrope';
+import { useState } from 'react';
 
 type Quest = {
-    id: number;
-    title: string;
-    description: string;
-  }
+  id: number;
+  title: string;
+  description: string;
+}
 
 export default function App() {
 
@@ -30,13 +31,22 @@ export default function App() {
     },
   ]
 
-  const currentQuest = quests[1]
-
   const [fontsLoaded] = useFonts({
     Manrope_400Regular,
     Manrope_500Medium,
     Manrope_600SemiBold,
   })
+
+  const [currentQuest, setCurrentQuest] = useState(quests[0])
+
+  function changeQuest() {
+    let newIndex = Math.floor(Math.random() * quests.length)
+
+    while (quests[newIndex].id === currentQuest.id) {
+      newIndex = Math.floor(Math.random() * quests.length)
+    }
+    setCurrentQuest(quests[newIndex])
+  }
 
   if (!fontsLoaded) return null
 
@@ -60,7 +70,10 @@ export default function App() {
             <Text style={styles.primaryButtonText}>Выполнить</Text>
           </Pressable>
 
-          <Pressable style={styles.secondaryButton}>
+          <Pressable 
+            style={styles.secondaryButton}
+            onPress={changeQuest}
+          >
             <Text style={styles.secondaryButtonText}>Заменить</Text>
           </Pressable>
 
