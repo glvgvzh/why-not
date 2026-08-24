@@ -4,7 +4,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } from '@expo-google-fonts/manrope';
 
+type Quest = {
+  id: number;
+  title: string;
+  description: string;
+}
+
 export default function App() {
+
+  const quest: Quest = {
+    id: 1,
+    title: 'Пройди сегодня новым маршрутом',
+    description: 'Сверни с привычной дороги и исследуй что-то новое',
+  }
+
   const [fontsLoaded] = useFonts({
     Manrope_400Regular,
     Manrope_500Medium,
@@ -26,8 +39,8 @@ export default function App() {
 
         <BlurView intensity={30} style={styles.questCard}>
           <Text style={styles.questLabel}>Опыт дня</Text>
-          <Text style={styles.questTitle}>Пройди сегодня новым маршрутом</Text>
-          <Text style={styles.questDescription}>Сверни с привычной дороги и исследуй что-то новое</Text>
+          <Text style={styles.questTitle}>{quest.title}</Text>
+          <Text style={styles.questDescription}>{quest.description}</Text>
 
           <Pressable style={styles.primaryButton}>
             <Text style={styles.primaryButtonText}>Выполнить</Text>
