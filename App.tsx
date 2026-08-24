@@ -5,18 +5,32 @@ import { BlurView } from 'expo-blur';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } from '@expo-google-fonts/manrope';
 
 type Quest = {
-  id: number;
-  title: string;
-  description: string;
-}
+    id: number;
+    title: string;
+    description: string;
+  }
 
 export default function App() {
 
-  const quest: Quest = {
-    id: 1,
-    title: 'Пройди сегодня новым маршрутом',
-    description: 'Сверни с привычной дороги и исследуй что-то новое',
-  }
+  const quests: Quest[] = [
+    {
+      id: 1,
+      title: 'Пройди сегодня новым маршрутом',
+      description: 'Сверни с привычной дороги и исследуй что-то новое',
+    },
+    {
+      id: 2,
+      title: 'Зайди сегодня в новое место',
+      description: 'Выбери кафе, магазин, двор или улицу, где ты раньше не был',
+    },
+    {
+      id: 3,
+      title: 'Сфотографируй одну случайную деталь дня',
+      description: 'Заметь что-то необычное вокруг и сохрани это как маленькое воспоминание',
+    },
+  ]
+
+  const currentQuest = quests[1]
 
   const [fontsLoaded] = useFonts({
     Manrope_400Regular,
@@ -39,8 +53,8 @@ export default function App() {
 
         <BlurView intensity={30} style={styles.questCard}>
           <Text style={styles.questLabel}>Опыт дня</Text>
-          <Text style={styles.questTitle}>{quest.title}</Text>
-          <Text style={styles.questDescription}>{quest.description}</Text>
+          <Text style={styles.questTitle}>{currentQuest.title}</Text>
+          <Text style={styles.questDescription}>{currentQuest.description}</Text>
 
           <Pressable style={styles.primaryButton}>
             <Text style={styles.primaryButtonText}>Выполнить</Text>
