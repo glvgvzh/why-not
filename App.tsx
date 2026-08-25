@@ -1,16 +1,13 @@
 import { styles } from './styles/mainScreen';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, Text, ImageBackground } from 'react-native';
+import { Text, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } from '@expo-google-fonts/manrope';
 import { useState } from 'react';
-
-type Quest = {
-  id: number;
-  title: string;
-  description: string;
-}
+import getDifferentQuest from './utils/quest';
+import type { Quest } from './types/quest';
+import QuestCard from './components/QuestCard';
 
 export default function App() {
 
@@ -41,16 +38,12 @@ export default function App() {
   const [currentQuest, setCurrentQuest] = useState(quests[0])
   const [isCompleted, setIsCompleted] = useState(false)
 
-  function changeQuest() {
-    let newIndex = Math.floor(Math.random() * quests.length)
-
-    while (quests[newIndex].id === currentQuest.id) {
-      newIndex = Math.floor(Math.random() * quests.length)
-    }
-    setCurrentQuest(quests[newIndex])
+  function changeQuest(): void {
+    const newQuest = getDifferentQuest(quests, currentQuest)
+    setCurrentQuest(newQuest)
   }
 
-  function completeQuest() {
+  function completeQuest(): void {
     setIsCompleted(true)
   }
 
@@ -66,32 +59,7 @@ export default function App() {
         <Text style={styles.appTitle}>WhyNot?</Text>
 
         <BlurView intensity={30} style={!isCompleted ? styles.activeQuestCard : styles.completedQuestCard}>
-          <Text style={styles.questLabel}>Опыт дня</Text>
-          <Text style={styles.questTitle}>{currentQuest.title}</Text>
-          <Text style={styles.questDescription}>{currentQuest.description}</Text>
-
-          {!isCompleted &&
-            <>
-              <Pressable
-                style={styles.primaryButton}
-                onPress={completeQuest}
-              >
-                <Text style={styles.primaryButtonText}>Выполнить</Text>
-              </Pressable>
-
-              <Pressable
-                style={styles.secondaryButton}
-                onPress={changeQuest}
-              >
-                <Text style={styles.secondaryButtonText}>Заменить</Text>
-              </Pressable>
-            </>
-          }
-
-          {isCompleted &&
-            <Text style={styles.completedText}>Выполнено</Text>
-          }
-
+          <QuestCard currentQuest={currentQuest} isCompleted={isCompleted} completeQuest={completeQuest} changeQuest={changeQuest} />
         </BlurView>
 
       </SafeAreaView>
