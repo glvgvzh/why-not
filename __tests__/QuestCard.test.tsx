@@ -39,6 +39,6 @@ describe('QuestCard', () => {
         )
 
         fireEvent.press(getByText('Выполнить'))
-        expect(completeQuest).toHaveBeenCalled()
+        expect(completeQuest).toHaveBeenCalledTimes(1)
     })
 })
