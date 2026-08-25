@@ -1,5 +1,6 @@
+import { styles } from './styles/mainScreen';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, StyleSheet, Text, ImageBackground } from 'react-native';
+import { Pressable, Text, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } from '@expo-google-fonts/manrope';
@@ -98,83 +99,3 @@ export default function App() {
     </ImageBackground>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  appTitle: {
-    fontSize: 28,
-    fontFamily: 'Manrope_600SemiBold',
-    marginBottom: 16,
-  },
-
-  activeQuestCard: {
-    width: '90%',
-    padding: 24,
-    borderRadius: 24,
-    backgroundColor: 'rgba(225, 225, 225, .4)',
-    overflow: 'hidden',
-  },
-  questLabel: {
-    fontSize: 14,
-    marginBottom: 8,
-    fontFamily: 'Manrope_500Medium',
-  },
-  questTitle: {
-    fontSize: 24,
-    marginBottom: 12,
-    fontFamily: 'Manrope_600SemiBold',
-  },
-  questDescription: {
-    fontSize: 16,
-    lineHeight: 22,
-    marginBottom: 20,
-    fontFamily: 'Manrope_400Regular',
-  },
-
-  completedQuestCard: {
-    width: '90%',
-    padding: 24,
-    borderRadius: 24,
-    backgroundColor: 'rgba(236, 255, 227, 0.4)',
-    overflow: 'hidden',
-  },
-
-  completedText: {
-    fontFamily: 'Manrope_600SemiBold',
-    fontSize: 18,
-    color: 'rgb(52, 116, 36)',
-  },
-
-  primaryButton: {
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    backgroundColor: 'rgba(225, 225, 225, .5)',
-    borderRadius: 16,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  primaryButtonText: {
-    fontFamily: 'Manrope_600SemiBold',
-    fontSize: 16,
-  },
-  secondaryButton: {
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 16,
-    backgroundColor: 'rgba(225, 225, 225, .3)',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  secondaryButtonText: {
-    fontFamily: 'Manrope_500Medium',
-    fontSize: 16,
-  },
-});
