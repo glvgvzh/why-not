@@ -13,6 +13,12 @@ type Quest = {
 
 export default function App() {
 
+  const [fontsLoaded] = useFonts({
+    Manrope_400Regular,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+  })
+
   const quests: Quest[] = [
     {
       id: 1,
@@ -31,13 +37,8 @@ export default function App() {
     },
   ]
 
-  const [fontsLoaded] = useFonts({
-    Manrope_400Regular,
-    Manrope_500Medium,
-    Manrope_600SemiBold,
-  })
-
   const [currentQuest, setCurrentQuest] = useState(quests[0])
+  const [isCompleted, setIsCompleted] = useState(false)
 
   function changeQuest() {
     let newIndex = Math.floor(Math.random() * quests.length)
@@ -46,6 +47,10 @@ export default function App() {
       newIndex = Math.floor(Math.random() * quests.length)
     }
     setCurrentQuest(quests[newIndex])
+  }
+
+  function completeQuest() {
+    setIsCompleted(true)
   }
 
   if (!fontsLoaded) return null
@@ -57,29 +62,35 @@ export default function App() {
       resizeMode='cover'
     >
       <SafeAreaView style={styles.safeArea}>
-        <BlurView intensity={30} style={styles.appTitleCard}>
-          <Text style={styles.appTitle}>WhyNot?</Text>
-        </BlurView>
+        <Text style={styles.appTitle}>WhyNot?</Text>
 
-        <BlurView intensity={30} style={styles.questCard}>
+        <BlurView intensity={30} style={!isCompleted ? styles.activeQuestCard : styles.completedQuestCard}>
           <Text style={styles.questLabel}>Опыт дня</Text>
           <Text style={styles.questTitle}>{currentQuest.title}</Text>
           <Text style={styles.questDescription}>{currentQuest.description}</Text>
 
-          <Pressable style={styles.primaryButton}>
-            <Text style={styles.primaryButtonText}>Выполнить</Text>
-          </Pressable>
+          {!isCompleted &&
+            <>
+              <Pressable
+                style={styles.primaryButton}
+                onPress={completeQuest}
+              >
+                <Text style={styles.primaryButtonText}>Выполнить</Text>
+              </Pressable>
 
-          <Pressable 
-            style={styles.secondaryButton}
-            onPress={changeQuest}
-          >
-            <Text style={styles.secondaryButtonText}>Заменить</Text>
-          </Pressable>
+              <Pressable
+                style={styles.secondaryButton}
+                onPress={changeQuest}
+              >
+                <Text style={styles.secondaryButtonText}>Заменить</Text>
+              </Pressable>
+            </>
+          }
 
-          <Pressable style={styles.ghostButton}>
-            <Text style={styles.ghostButtonText}>Пропустить</Text>
-          </Pressable>
+          {isCompleted &&
+            <Text style={styles.completedText}>Выполнено</Text>
+          }
+
         </BlurView>
 
       </SafeAreaView>
@@ -98,19 +109,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  appTitleCard: {
-    padding: 10,
-    backgroundColor: 'rgba(225, 225, 225, .4)',
-    overflow: 'hidden',
-    borderRadius: 24,
-    marginBottom: 16,
-  },
   appTitle: {
     fontSize: 28,
     fontFamily: 'Manrope_600SemiBold',
+    marginBottom: 16,
   },
 
-  questCard: {
+  activeQuestCard: {
     width: '90%',
     padding: 24,
     borderRadius: 24,
@@ -132,6 +137,20 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 20,
     fontFamily: 'Manrope_400Regular',
+  },
+
+  completedQuestCard: {
+    width: '90%',
+    padding: 24,
+    borderRadius: 24,
+    backgroundColor: 'rgba(236, 255, 227, 0.4)',
+    overflow: 'hidden',
+  },
+
+  completedText: {
+    fontFamily: 'Manrope_600SemiBold',
+    fontSize: 18,
+    color: 'rgb(52, 116, 36)',
   },
 
   primaryButton: {
@@ -157,13 +176,5 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontFamily: 'Manrope_500Medium',
     fontSize: 16,
-  },
-  ghostButton: {
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  ghostButtonText: {
-    fontFamily: 'Manrope_400Regular',
-    fontSize: 15,
   },
 });
