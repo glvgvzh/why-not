@@ -5,12 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } from '@expo-google-fonts/manrope';
 import { useState } from 'react';
-
-type Quest = {
-  id: number;
-  title: string;
-  description: string;
-}
+import getDifferentQuest from './utils/quest';
+import { Quest } from './types/quest';
 
 export default function App() {
 
@@ -41,16 +37,12 @@ export default function App() {
   const [currentQuest, setCurrentQuest] = useState(quests[0])
   const [isCompleted, setIsCompleted] = useState(false)
 
-  function changeQuest() {
-    let newIndex = Math.floor(Math.random() * quests.length)
-
-    while (quests[newIndex].id === currentQuest.id) {
-      newIndex = Math.floor(Math.random() * quests.length)
-    }
-    setCurrentQuest(quests[newIndex])
+  function changeQuest(): void {
+    const newQuest = getDifferentQuest(quests, currentQuest)
+    setCurrentQuest(newQuest)
   }
 
-  function completeQuest() {
+  function completeQuest(): void {
     setIsCompleted(true)
   }
 
