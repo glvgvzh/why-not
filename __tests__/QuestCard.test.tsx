@@ -11,7 +11,7 @@ describe('QuestCard', () => {
         const { getByText, queryByText } = await render(
             <QuestCard
                 currentQuest={quest}
-                isCompleted={true}
+                status='completed'
                 completeQuest={() => { }}
                 changeQuest={() => { }}
             />
@@ -32,7 +32,7 @@ describe('QuestCard', () => {
         const { getByText } = await render(
             <QuestCard
                 currentQuest={quest}
-                isCompleted={false}
+                status='active'
                 completeQuest={completeQuest}
                 changeQuest={() => { }}
             />
