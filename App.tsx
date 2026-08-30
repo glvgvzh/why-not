@@ -7,6 +7,7 @@ import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } 
 import { useState } from 'react';
 import getDifferentQuest from './utils/quest';
 import { quests } from './data/quests';
+import type { DailyQuest } from './types/quest';
 
 import QuestCard from './components/QuestCard';
 
@@ -18,16 +19,19 @@ export default function App() {
     Manrope_600SemiBold,
   })
 
-  const [currentQuest, setCurrentQuest] = useState(quests[0])
-  const [isCompleted, setIsCompleted] = useState(false)
+  const [dailyQuest, setDailyQuest] = useState<DailyQuest>({
+    quest: quests[0],
+    date: Date.now(),
+    status: 'active',
+  })
 
   function changeQuest(): void {
-    const newQuest = getDifferentQuest(quests, currentQuest)
-    setCurrentQuest(newQuest)
+    const newQuest = getDifferentQuest(quests, dailyQuest.quest)
+    setDailyQuest({ ...dailyQuest, quest: newQuest })
   }
 
   function completeQuest(): void {
-    setIsCompleted(true)
+    setDailyQuest({ ...dailyQuest, status: 'completed' })
   }
 
   if (!fontsLoaded) return null
@@ -41,8 +45,8 @@ export default function App() {
       <SafeAreaView style={styles.safeArea}>
         <Text style={styles.appTitle}>WhyNot?</Text>
 
-        <BlurView intensity={30} style={!isCompleted ? styles.activeQuestCard : styles.completedQuestCard}>
-          <QuestCard currentQuest={currentQuest} isCompleted={isCompleted} completeQuest={completeQuest} changeQuest={changeQuest} />
+        <BlurView intensity={30} style={dailyQuest.status === 'active' ? styles.activeQuestCard : styles.completedQuestCard}>
+          <QuestCard currentQuest={dailyQuest.quest} status={dailyQuest.status} completeQuest={completeQuest} changeQuest={changeQuest} />
         </BlurView>
 
       </SafeAreaView>

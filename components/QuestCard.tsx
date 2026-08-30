@@ -1,22 +1,22 @@
 import { Pressable, Text } from 'react-native';
 import { styles } from '../styles/mainScreen';
-import type { Quest } from '../types/quest';
+import type { Quest, DailyQuest } from '../types/quest';
 
 type QuestCardProps = {
     currentQuest: Quest;
-    isCompleted: boolean;
+    status: DailyQuest['status'];
     completeQuest: () => void;
     changeQuest: () => void;
 }
 
-function QuestCard({ currentQuest, isCompleted, completeQuest, changeQuest }: QuestCardProps) {
+function QuestCard({ currentQuest, status, completeQuest, changeQuest }: QuestCardProps) {
     return (
         <>
             <Text style={styles.questLabel}>Опыт дня</Text>
             <Text style={styles.questTitle}>{currentQuest.title}</Text>
             <Text style={styles.questDescription}>{currentQuest.description}</Text>
 
-            {!isCompleted &&
+            {status === 'active' &&
                 <>
                     <Pressable
                         style={styles.primaryButton}
@@ -34,7 +34,7 @@ function QuestCard({ currentQuest, isCompleted, completeQuest, changeQuest }: Qu
                 </>
             }
 
-            {isCompleted &&
+            {status === 'completed' &&
                 <Text style={styles.completedText}>Выполнено</Text>
             }
         </>
