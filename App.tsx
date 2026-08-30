@@ -4,11 +4,12 @@ import { Text, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } from '@expo-google-fonts/manrope';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
 import getDifferentQuest from './utils/quest';
 import { quests } from './data/quests';
 import type { DailyQuest } from './types/quest';
-
+import { getDailyQuestFromStorage, setDailyQuestInStorage } from './storage/dailyQuestStorage';
 import QuestCard from './components/QuestCard';
 
 export default function App() {
@@ -25,6 +26,8 @@ export default function App() {
     status: 'active',
   })
 
+  const [isStorageLoaded, setIsStorageLoaded] = useState(false)
+
   function changeQuest(): void {
     const newQuest = getDifferentQuest(quests, dailyQuest.quest)
     setDailyQuest({ ...dailyQuest, quest: newQuest })
@@ -33,6 +36,23 @@ export default function App() {
   function completeQuest(): void {
     setDailyQuest({ ...dailyQuest, status: 'completed' })
   }
+
+  useEffect(() => {
+    async function loadData() {
+      const storageData = await getDailyQuestFromStorage()
+      if (storageData) {
+        setDailyQuest(storageData)
+      }
+      setIsStorageLoaded(true)
+    }
+    loadData()
+  }, [])
+
+  useEffect(() => {
+    if (isStorageLoaded) {
+      setDailyQuestInStorage(dailyQuest)
+    }
+  }, [dailyQuest, isStorageLoaded])
 
   if (!fontsLoaded) return null
 
