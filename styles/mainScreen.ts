@@ -22,6 +22,7 @@ export const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: 'rgba(225, 225, 225, .4)',
     overflow: 'hidden',
+    marginBottom: 24,
   },
   questLabel: {
     fontSize: 14,
@@ -46,6 +47,7 @@ export const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: 'rgba(236, 255, 227, 0.4)',
     overflow: 'hidden',
+    marginBottom: 24,
   },
 
   completedText: {
@@ -72,10 +74,14 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: 'rgba(225, 225, 225, .3)',
     alignItems: 'center',
-    marginBottom: 8,
   },
   secondaryButtonText: {
     fontFamily: 'Manrope_500Medium',
     fontSize: 16,
   },
+  historyButtonBlur: {
+    alignSelf: 'center',
+    borderRadius: 16,
+    overflow: 'hidden',
+  }
 });
