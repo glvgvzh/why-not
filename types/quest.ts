@@ -4,8 +4,10 @@ export type Quest = {
   description: string;
 }
 
+export type DateString = `${number}-${number}-${number}`
+
 export type DailyQuest = {
   quest: Quest;
-  date: number;
-  status: 'active' | 'completed';
+  date: DateString;
+  status: 'active' | 'completed' | 'missed';
 }
