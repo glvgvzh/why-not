@@ -1,8 +1,7 @@
 import { styles } from './styles/mainScreen';
 import { StatusBar } from 'expo-status-bar';
-import { Text, ImageBackground } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurView } from 'expo-blur';
+import { ImageBackground } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } from '@expo-google-fonts/manrope';
 import { useEffect, useState } from 'react';
 
@@ -11,8 +10,10 @@ import { quests } from './data/quests';
 import type { DailyQuest, DateString, Quest } from './types/quest';
 import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests } from './utils/dailyQuest';
 import { getDailyQuestFromStorage, setDailyQuestInStorage } from './storage/dailyQuestStorage';
-import QuestCard from './components/QuestCard';
 import { getHistoryFromStorage, setHistoryInStorage } from './storage/historyStorage';
+import MainScreen from './screens/MainScreen';
+import HistoryScreen from './screens/HistoryScreen';
+
 
 export default function App() {
 
@@ -29,8 +30,8 @@ export default function App() {
   })
 
   const [isStorageLoaded, setIsStorageLoaded] = useState(false)
-
   const [history, setHistory] = useState<DailyQuest[]>([])
+  const [currentScreen, setCurrentScreen] = useState<'main' | 'history'>('main')
 
   function changeQuest(): void {
     const availableQuests = excludeClosedQuests(quests, history)
@@ -89,20 +90,31 @@ export default function App() {
   if (!fontsLoaded) return null
 
   return (
-    <ImageBackground
-      source={require('./assets/background1.jpg')}
-      style={styles.container}
-      resizeMode='cover'
-    >
-      <SafeAreaView style={styles.safeArea}>
-        <Text style={styles.appTitle}>WhyNot?</Text>
+    <SafeAreaProvider>
+      <ImageBackground
+        source={require('./assets/background1.jpg')}
+        style={styles.container}
+        resizeMode='cover'
+      >
+        <SafeAreaView style={styles.safeArea}>
+          {currentScreen === 'main' &&
+            <MainScreen
+              dailyQuest={dailyQuest}
+              completeQuest={completeQuest}
+              changeQuest={changeQuest}
+              onOpenHistory={() => setCurrentScreen('history')}
+            />
+          }
+          {currentScreen === 'history' &&
+            <HistoryScreen
+              history={history}
+              onBack={() => setCurrentScreen('main')}
+            />
+          }
+        </SafeAreaView>
 
-        <BlurView intensity={30} style={dailyQuest.status === 'active' ? styles.activeQuestCard : styles.completedQuestCard}>
-          <QuestCard currentQuest={dailyQuest.quest} status={dailyQuest.status} completeQuest={completeQuest} changeQuest={changeQuest} />
-        </BlurView>
-
-      </SafeAreaView>
-      <StatusBar style="auto" />
-    </ImageBackground>
+        <StatusBar style="auto" />
+      </ImageBackground>
+    </SafeAreaProvider>
   );
 }
