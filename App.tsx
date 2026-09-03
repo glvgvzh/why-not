@@ -112,7 +112,6 @@ export default function App() {
             />
           }
         </SafeAreaView>
-
         <StatusBar style="auto" />
       </ImageBackground>
     </SafeAreaProvider>
