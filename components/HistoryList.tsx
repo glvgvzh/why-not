@@ -1,6 +1,7 @@
 import { styles } from "../styles/historyScreen";
 import { Text, View } from 'react-native';
 import type { DailyQuest } from "../types/quest"
+import { BlurView } from "expo-blur";
 
 type HistoryListProps = {
     history: DailyQuest[]
@@ -8,30 +9,27 @@ type HistoryListProps = {
 
 function HistoryList({ history }: HistoryListProps) {
     if (history.length === 0) {
-        return (
-            <Text style={styles.emptyHistory}>История пока пуста</Text>
-        )
+        return <Text style={styles.emptyHistory}>История пока пуста</Text>
     }
     return (
         history.map(historyItem => {
-            if (historyItem.status === 'completed') {
-                return (
-                    <View key={historyItem.date}>
-                        <Text>{historyItem.date}</Text>
-                        <Text>{historyItem.quest.title}</Text>
-                        <Text>{historyItem.quest.description}</Text>
-                        <Text>Выполнено</Text>
+            return (
+                <BlurView key={historyItem.date} intensity={30} style={historyItem.status === 'completed' ? styles.historyCardCompleted : styles.historyCardMissed}>
+                    <View>
+                        <Text style={styles.questDate}>{historyItem.date}</Text>
+                        {historyItem.status === 'completed' &&
+                            <>
+                                <Text style={styles.questTitle}>{historyItem.quest.title}</Text>
+                                <Text style={styles.questDescription}>{historyItem.quest.description}</Text>
+                                <Text style={styles.completedText}>Выполнено</Text>
+                            </>
+                        }
+                        {historyItem.status === 'missed' &&
+                            <Text style={styles.missedText}>Пропущено</Text>
+                        }
                     </View>
-                )
-            } else if (historyItem.status === 'missed') {
-                return (
-                    <View key={historyItem.date}>
-                        <Text>{historyItem.date}</Text>
-                        <Text>Пропущено</Text>
-                    </View>
-                )
-            }
-            return null
+                </BlurView>
+            )
         })
     )
 }
