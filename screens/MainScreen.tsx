@@ -1,6 +1,6 @@
 import { styles } from "../styles/mainScreen"
 import { BlurView } from 'expo-blur';
-import { Text, Pressable } from "react-native"
+import { Text, Pressable, View } from "react-native"
 import QuestCard from "../components/QuestCard";
 import type { DailyQuest } from "../types/quest";
 
@@ -13,7 +13,7 @@ type MainScreenProps = {
 
 function MainScreen({ dailyQuest, completeQuest, changeQuest, onOpenHistory }: MainScreenProps) {
     return (
-        <>
+        <View style={styles.container}>
             <Text style={styles.appTitle}>WhyNot?</Text>
 
             <BlurView intensity={30} style={dailyQuest.status === 'active' ? styles.activeQuestCard : styles.completedQuestCard}>
@@ -25,7 +25,7 @@ function MainScreen({ dailyQuest, completeQuest, changeQuest, onOpenHistory }: M
                     <Text style={styles.secondaryButtonText}>История</Text>
                 </Pressable>
             </BlurView>
-        </>
+        </View>
     )
 }
 

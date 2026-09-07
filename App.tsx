@@ -1,4 +1,4 @@
-import { styles } from './styles/mainScreen';
+import { styles } from './styles/app';
 import { StatusBar } from 'expo-status-bar';
 import { ImageBackground } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
