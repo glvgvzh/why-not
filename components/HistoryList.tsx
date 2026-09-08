@@ -11,8 +11,10 @@ function HistoryList({ history }: HistoryListProps) {
     if (history.length === 0) {
         return <Text style={styles.emptyHistory}>История пока пуста</Text>
     }
+    const sortedHistory: DailyQuest[] = [...history].sort((a, b) => Number(new Date(b.date)) - Number(new Date(a.date)))
+
     return (
-        history.map(historyItem => {
+        sortedHistory.map(historyItem => {
             return (
                 <BlurView key={historyItem.date} intensity={30} style={historyItem.status === 'completed' ? styles.historyCardCompleted : styles.historyCardMissed}>
                     <View>

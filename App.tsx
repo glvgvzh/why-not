@@ -14,7 +14,6 @@ import { getHistoryFromStorage, setHistoryInStorage } from './storage/historySto
 import MainScreen from './screens/MainScreen';
 import HistoryScreen from './screens/HistoryScreen';
 
-
 export default function App() {
 
   const [fontsLoaded] = useFonts({
