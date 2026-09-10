@@ -27,7 +27,6 @@ export default function App() {
     date: formatDate(new Date()),
     status: 'active',
   })
-
   const [isStorageLoaded, setIsStorageLoaded] = useState(false)
   const [history, setHistory] = useState<DailyQuest[]>([])
   const [currentScreen, setCurrentScreen] = useState<'main' | 'history'>('main')
@@ -39,23 +38,30 @@ export default function App() {
   }
 
   function completeQuest(): void {
-    setDailyQuest({ ...dailyQuest, status: 'completed' })
+    const completedDailyQuest: DailyQuest = { ...dailyQuest, status: 'completed' }
+    const updatedHistory: DailyQuest[] = [...history, completedDailyQuest]
+    setDailyQuest(completedDailyQuest)
+    setHistory(updatedHistory)
   }
 
   useEffect(() => {
     async function loadData() {
       const storageHistory: DailyQuest[] = await getHistoryFromStorage()
-      const storageData: DailyQuest | null = await getDailyQuestFromStorage()
-      if (storageData) {
+      const storageDailyQuest: DailyQuest | null = await getDailyQuestFromStorage()
+      if (storageDailyQuest) {
         const currentDate: DateString = formatDate(new Date())
 
-        if (isDateChanged(storageData.date, currentDate)) {
-          const finalizedDailyQuest: DailyQuest = finalizeDailyQuest(storageData)
-          const updatedHistory: DailyQuest[] = [...storageHistory, finalizedDailyQuest]
-          const availableQuests: Quest[] = excludeClosedQuests(quests, updatedHistory)
-          const newQuest: Quest = getDifferentQuest(availableQuests, storageData.quest)
+        if (isDateChanged(storageDailyQuest.date, currentDate)) {
+          let actualHistory: DailyQuest[] = [...storageHistory]
 
-          setHistory(updatedHistory)
+          if (storageDailyQuest.status === 'active') {
+            const finalizedDailyQuest: DailyQuest = finalizeDailyQuest(storageDailyQuest)
+            actualHistory = [...storageHistory, finalizedDailyQuest]
+          }
+
+          setHistory(actualHistory)
+          const availableQuests: Quest[] = excludeClosedQuests(quests, actualHistory)
+          const newQuest: Quest = getDifferentQuest(availableQuests, storageDailyQuest.quest)
           setDailyQuest({
             quest: newQuest,
             date: currentDate,
@@ -63,7 +69,7 @@ export default function App() {
           })
 
         } else {
-          setDailyQuest(storageData)
+          setDailyQuest(storageDailyQuest)
           setHistory(storageHistory)
         }
       } else {
