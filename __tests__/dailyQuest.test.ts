@@ -1,4 +1,4 @@
-import type { DateString, DailyQuest, Quest } from "../types/quest";
+import type { DateString, DailyQuest, Quest, HistoryItem } from "../types/quest";
 import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests } from "../utils/dailyQuest";
 
 describe('formatDate', () => {
@@ -100,7 +100,7 @@ describe('excludeClosedQuests', () => {
                 description: 'description 4',
             },
         ]
-        const history: DailyQuest[] = [
+        const history: HistoryItem[] = [
             {
                 quest: {
                     id: 1,
@@ -118,6 +118,14 @@ describe('excludeClosedQuests', () => {
                 },
                 date: '2026-08-31',
                 status: 'completed',
+            },
+            {
+                date: '2026-09-01',
+                status: 'missed',
+            },
+            {
+                date: '2026-09-02',
+                status: 'missed',
             },
         ]
         const availableQuests: Quest[] = excludeClosedQuests(quests, history)
@@ -159,7 +167,7 @@ describe('excludeClosedQuests', () => {
                 description: 'description 4',
             },
         ]
-        const history: DailyQuest[] = []
+        const history: HistoryItem[] = []
         const availableQuests: Quest[] = excludeClosedQuests(quests, history)
 
         expect(availableQuests).toStrictEqual([
@@ -209,7 +217,7 @@ describe('excludeClosedQuests', () => {
                 description: 'description 4',
             },
         ]
-        const history: DailyQuest[] = [
+        const history: HistoryItem[] = [
             {
                 quest: {
                     id: 1,

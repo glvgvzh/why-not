@@ -11,3 +11,10 @@ export type DailyQuest = {
   date: DateString;
   status: 'active' | 'completed' | 'missed';
 }
+
+export type MissedDay = {
+  date: DateString;
+  status: 'missed';
+}
+
+export type HistoryItem = DailyQuest | MissedDay

@@ -1,10 +1,10 @@
 import { Text, Pressable, View, ScrollView } from "react-native";
-import type { DailyQuest } from "../types/quest";
+import type { HistoryItem } from "../types/quest";
 import HistoryList from "../components/HistoryList";
 import { styles } from "../styles/historyScreen";
 
 type HistoryScreenProps = {
-    history: DailyQuest[];
+    history: HistoryItem[];
     onBack: () => void;
 }
 

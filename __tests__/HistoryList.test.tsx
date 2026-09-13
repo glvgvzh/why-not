@@ -1,18 +1,18 @@
 import HistoryList from "../components/HistoryList"
 import { render } from "@testing-library/react-native"
-import type { DailyQuest } from "../types/quest"
+import type { HistoryItem } from "../types/quest"
 
 describe('HistoryList', () => {
     test('handles empty state', async () => {
-        const history: DailyQuest[] = []
+        const history: HistoryItem[] = []
         const { getByText } = await render(
             <HistoryList history={history} />
         )
         expect(getByText('История пока пуста')).toBeTruthy()
     })
 
-    test('status missed shows only date and status', async () => {
-        const history: DailyQuest[] = [
+    test('status missed in type DailyQuest shows only date and status', async () => {
+        const history: HistoryItem[] = [
             {
                 quest: {
                     id: 1,
@@ -32,8 +32,22 @@ describe('HistoryList', () => {
         expect(queryByText('description1')).toBeNull()
     })
 
+    test('status missed in type MissedDay shows only date and status', async () => {
+        const history: HistoryItem[] = [
+            {
+                date: '2026-08-30',
+                status: 'missed',
+            }
+        ]
+        const { getByText } = await render(
+            <HistoryList history={history} />
+        )
+        expect(getByText('2026-08-30')).toBeTruthy()
+        expect(getByText('Пропущено')).toBeTruthy()
+    })
+
     test('status completed shows date, title, description, and status', async () => {
-        const history: DailyQuest[] = [
+        const history: HistoryItem[] = [
             {
                 quest: {
                     id: 2,
@@ -54,7 +68,7 @@ describe('HistoryList', () => {
     })
 
     test('shows sorted history array', async () => {
-        const history: DailyQuest[] = [
+        const history: HistoryItem[] = [
             {
                 quest: {
                     id: 1,

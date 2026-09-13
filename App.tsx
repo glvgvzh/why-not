@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 
 import getDifferentQuest from './utils/quest';
 import { quests } from './data/quests';
-import type { DailyQuest, DateString, Quest } from './types/quest';
+import type { DailyQuest, DateString, Quest, HistoryItem } from './types/quest';
 import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests } from './utils/dailyQuest';
 import { getDailyQuestFromStorage, setDailyQuestInStorage } from './storage/dailyQuestStorage';
 import { getHistoryFromStorage, setHistoryInStorage } from './storage/historyStorage';
@@ -28,7 +28,7 @@ export default function App() {
     status: 'active',
   })
   const [isStorageLoaded, setIsStorageLoaded] = useState(false)
-  const [history, setHistory] = useState<DailyQuest[]>([])
+  const [history, setHistory] = useState<HistoryItem[]>([])
   const [currentScreen, setCurrentScreen] = useState<'main' | 'history'>('main')
 
   function changeQuest(): void {
@@ -39,20 +39,20 @@ export default function App() {
 
   function completeQuest(): void {
     const completedDailyQuest: DailyQuest = { ...dailyQuest, status: 'completed' }
-    const updatedHistory: DailyQuest[] = [...history, completedDailyQuest]
+    const updatedHistory: HistoryItem[] = [...history, completedDailyQuest]
     setDailyQuest(completedDailyQuest)
     setHistory(updatedHistory)
   }
 
   useEffect(() => {
     async function loadData() {
-      const storageHistory: DailyQuest[] = await getHistoryFromStorage()
+      const storageHistory: HistoryItem[] = await getHistoryFromStorage()
       const storageDailyQuest: DailyQuest | null = await getDailyQuestFromStorage()
       if (storageDailyQuest) {
         const currentDate: DateString = formatDate(new Date())
 
         if (isDateChanged(storageDailyQuest.date, currentDate)) {
-          let actualHistory: DailyQuest[] = [...storageHistory]
+          let actualHistory: HistoryItem[] = [...storageHistory]
 
           if (storageDailyQuest.status === 'active') {
             const finalizedDailyQuest: DailyQuest = finalizeDailyQuest(storageDailyQuest)

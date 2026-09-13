@@ -1,4 +1,4 @@
-import type { DateString, DailyQuest, Quest } from "../types/quest"
+import type { DateString, DailyQuest, Quest, HistoryItem } from "../types/quest"
 
 export function isDateChanged(dailyQuestDate: DateString, currentDate: DateString): boolean {
     return dailyQuestDate !== currentDate
@@ -18,6 +18,6 @@ export function finalizeDailyQuest(dailyQuest: DailyQuest): DailyQuest {
     return dailyQuest
 }
 
-export function excludeClosedQuests(quests: Quest[], history: DailyQuest[]): Quest[] {
-    return quests.filter((quest: Quest) => !history.some((historyQuest: DailyQuest) => historyQuest.quest.id === quest.id))
+export function excludeClosedQuests(quests: Quest[], history: HistoryItem[]): Quest[] {
+    return quests.filter((quest: Quest) => !history.some((historyQuest: HistoryItem) => 'quest' in historyQuest && historyQuest.quest.id === quest.id))
 }
