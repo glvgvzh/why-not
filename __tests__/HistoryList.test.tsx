@@ -26,7 +26,7 @@ describe('HistoryList', () => {
         const { getByText, queryByText } = await render(
             <HistoryList history={history} />
         )
-        expect(getByText('2026-08-30')).toBeTruthy()
+        expect(getByText('30.08.2026')).toBeTruthy()
         expect(getByText('Пропущено')).toBeTruthy()
         expect(queryByText('title1')).toBeNull()
         expect(queryByText('description1')).toBeNull()
@@ -42,7 +42,7 @@ describe('HistoryList', () => {
         const { getByText } = await render(
             <HistoryList history={history} />
         )
-        expect(getByText('2026-08-30')).toBeTruthy()
+        expect(getByText('30.08.2026')).toBeTruthy()
         expect(getByText('Пропущено')).toBeTruthy()
     })
 
@@ -61,7 +61,7 @@ describe('HistoryList', () => {
         const { getByText } = await render(
             <HistoryList history={history} />
         )
-        expect(getByText('2026-08-31')).toBeTruthy()
+        expect(getByText('31.08.2026')).toBeTruthy()
         expect(getByText('Выполнено')).toBeTruthy()
         expect(getByText('title2')).toBeTruthy()
         expect(getByText('description2')).toBeTruthy()
@@ -100,14 +100,14 @@ describe('HistoryList', () => {
         const { getAllByText } = await render(
             <HistoryList history={history} />
         )
-        const sortedHistoryDates = getAllByText(/\d{4}-\d{2}-\d{2}/)
+        const sortedHistoryDates = getAllByText(/\d{2}\.\d{2}\.\d{4}/)
 
         expect(history[0].date).toBe('2026-09-30')
         expect(history[1].date).toBe('2027-08-31')
         expect(history[2].date).toBe('1999-08-31')
 
-        expect(sortedHistoryDates[0]).toHaveTextContent('2027-08-31')
-        expect(sortedHistoryDates[1]).toHaveTextContent('2026-09-30')
-        expect(sortedHistoryDates[2]).toHaveTextContent('1999-08-31')
+        expect(sortedHistoryDates[0]).toHaveTextContent('31.08.2027')
+        expect(sortedHistoryDates[1]).toHaveTextContent('30.09.2026')
+        expect(sortedHistoryDates[2]).toHaveTextContent('31.08.1999')
     })
 })

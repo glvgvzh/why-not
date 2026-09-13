@@ -1,10 +1,15 @@
 import { styles } from "../styles/historyScreen";
 import { Text, View } from 'react-native';
-import type { HistoryItem } from "../types/quest"
+import type { DateString, HistoryItem } from "../types/quest"
 import { BlurView } from "expo-blur";
 
 type HistoryListProps = {
     history: HistoryItem[]
+}
+
+function formatDateForUI(date: DateString): string {
+    const dateParts = date.split('-')
+    return `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`
 }
 
 function HistoryList({ history }: HistoryListProps) {
@@ -18,7 +23,7 @@ function HistoryList({ history }: HistoryListProps) {
             return (
                 <BlurView key={historyItem.date} intensity={30} style={historyItem.status === 'completed' ? styles.historyCardCompleted : styles.historyCardMissed}>
                     <View>
-                        <Text style={styles.questDate}>{historyItem.date}</Text>
+                        <Text style={styles.questDate}>{formatDateForUI(historyItem.date)}</Text>
                         {historyItem.status === 'completed' &&
                             <>
                                 <Text style={styles.questTitle}>{historyItem.quest.title}</Text>
