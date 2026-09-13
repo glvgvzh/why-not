@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import getDifferentQuest from './utils/quest';
 import { quests } from './data/quests';
 import type { DailyQuest, DateString, Quest, HistoryItem } from './types/quest';
-import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests } from './utils/dailyQuest';
+import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests, getMissedDays } from './utils/dailyQuest';
 import { getDailyQuestFromStorage, setDailyQuestInStorage } from './storage/dailyQuestStorage';
 import { getHistoryFromStorage, setHistoryInStorage } from './storage/historyStorage';
 import MainScreen from './screens/MainScreen';
@@ -56,7 +56,16 @@ export default function App() {
 
           if (storageDailyQuest.status === 'active') {
             const finalizedDailyQuest: DailyQuest = finalizeDailyQuest(storageDailyQuest)
-            actualHistory = [...storageHistory, finalizedDailyQuest]
+            if (!actualHistory.some(historyItem => historyItem.date === finalizedDailyQuest.date)) {
+              actualHistory = [...actualHistory, finalizedDailyQuest]
+            }
+          }
+
+          const missedDays = getMissedDays(storageDailyQuest.date, currentDate)
+          for (const missedDay of missedDays) {
+            if (!actualHistory.some(historyItem => historyItem.date === missedDay)) {
+              actualHistory = [...actualHistory, { date: missedDay, status: 'missed' }]
+            }
           }
 
           setHistory(actualHistory)
