@@ -1,5 +1,5 @@
-import type { DateString, DailyQuest, Quest } from "../types/quest";
-import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests } from "../utils/dailyQuest";
+import type { DateString, DailyQuest, Quest, HistoryItem } from "../types/quest";
+import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests, getMissedDays } from "../utils/dailyQuest";
 
 describe('formatDate', () => {
     test('formats date with leading zeros', () => {
@@ -100,7 +100,7 @@ describe('excludeClosedQuests', () => {
                 description: 'description 4',
             },
         ]
-        const history: DailyQuest[] = [
+        const history: HistoryItem[] = [
             {
                 quest: {
                     id: 1,
@@ -118,6 +118,14 @@ describe('excludeClosedQuests', () => {
                 },
                 date: '2026-08-31',
                 status: 'completed',
+            },
+            {
+                date: '2026-09-01',
+                status: 'missed',
+            },
+            {
+                date: '2026-09-02',
+                status: 'missed',
             },
         ]
         const availableQuests: Quest[] = excludeClosedQuests(quests, history)
@@ -159,7 +167,7 @@ describe('excludeClosedQuests', () => {
                 description: 'description 4',
             },
         ]
-        const history: DailyQuest[] = []
+        const history: HistoryItem[] = []
         const availableQuests: Quest[] = excludeClosedQuests(quests, history)
 
         expect(availableQuests).toStrictEqual([
@@ -209,7 +217,7 @@ describe('excludeClosedQuests', () => {
                 description: 'description 4',
             },
         ]
-        const history: DailyQuest[] = [
+        const history: HistoryItem[] = [
             {
                 quest: {
                     id: 1,
@@ -250,5 +258,43 @@ describe('excludeClosedQuests', () => {
         const availableQuests: Quest[] = excludeClosedQuests(quests, history)
 
         expect(availableQuests).toStrictEqual([])
+    })
+})
+
+describe('getMissedDays', () => {
+    test('returns missed days', () => {
+        const firstDate: DateString = '2026-09-01'
+        const currentDate: DateString = '2026-09-05'
+        expect(getMissedDays(firstDate, currentDate)).toStrictEqual([
+            '2026-09-02',
+            '2026-09-03',
+            '2026-09-04'
+        ])
+    })
+
+    test('returns empty array', () => {
+        const firstDate: DateString = '2026-09-01'
+        const currentDate: DateString = '2026-09-02'
+        expect(getMissedDays(firstDate, currentDate)).toStrictEqual([])
+    })
+    
+    test('returns missed days with changed month', () => {
+        const firstDate: DateString = '2026-09-29'
+        const currentDate: DateString = '2026-10-02'
+        expect(getMissedDays(firstDate, currentDate)).toStrictEqual([
+            '2026-09-30',
+            '2026-10-01',
+        ])
+    })
+
+    test('returns missed days with changed year', () => {
+        const firstDate: DateString = '2026-12-29'
+        const currentDate: DateString = '2027-01-03'
+        expect(getMissedDays(firstDate, currentDate)).toStrictEqual([
+            '2026-12-30',
+            '2026-12-31',
+            '2027-01-01',
+            '2027-01-02'
+        ])
     })
 })

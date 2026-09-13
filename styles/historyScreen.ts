@@ -35,6 +35,8 @@ export const styles = StyleSheet.create({
     emptyHistory: {
         fontSize: 16,
         fontFamily: 'Manrope_400Regular',
+        alignSelf: 'center',
+        color: 'rgba(0, 0, 0, 0.4)',
     },
     backButton: {
         paddingVertical: 10,
