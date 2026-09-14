@@ -5,7 +5,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } from '@expo-google-fonts/manrope';
 import { useEffect, useState } from 'react';
 
-import getDifferentQuest from './utils/quest';
+import { getDifferentQuest, selectQuestForNewDay } from './utils/quest';
 import { quests } from './data/quests';
 import type { DailyQuest, DateString, Quest, HistoryItem } from './types/quest';
 import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests, getMissedDays } from './utils/dailyQuest';
@@ -34,6 +34,7 @@ export default function App() {
   function changeQuest(): void {
     const availableQuests = excludeClosedQuests(quests, history)
     const newQuest = getDifferentQuest(availableQuests, dailyQuest.quest)
+    if (newQuest === null) return
     setDailyQuest({ ...dailyQuest, quest: newQuest })
   }
 
@@ -70,7 +71,8 @@ export default function App() {
 
           setHistory(actualHistory)
           const availableQuests: Quest[] = excludeClosedQuests(quests, actualHistory)
-          const newQuest: Quest = getDifferentQuest(availableQuests, storageDailyQuest.quest)
+          const newQuest: Quest = selectQuestForNewDay(availableQuests, quests, storageDailyQuest.quest)
+
           setDailyQuest({
             quest: newQuest,
             date: currentDate,
