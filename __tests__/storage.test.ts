@@ -51,6 +51,38 @@ describe('getDailyQuestFromStorage', () => {
         expect(result).toBeNull()
     })
 
+    test('keeps valid history when daily quest read fails', async () => {
+        const savedHistory = [
+            {
+                date: '2026-09-10',
+                status: 'missed',
+            },
+            {
+                quest: {
+                    id: 1,
+                    title: 'title',
+                    description: 'description',
+                },
+                date: '2026-09-11',
+                status: 'completed'
+            }
+        ]
+        mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
+            if (key === 'dailyQuest') {
+                throw new Error('storage read failed')
+            }
+            if (key === 'history') {
+                return JSON.stringify(savedHistory)
+            }
+            return null
+        })
+        const dailyQuestResult = await getDailyQuestFromStorage()
+        const historyResult = await getHistoryFromStorage()
+
+        expect(dailyQuestResult).toBeNull()
+        expect(historyResult).toStrictEqual(savedHistory)
+    })
+
     test('returns null for invalid JSON', async () => {
         mockedAsyncStorage.getItem.mockResolvedValue('id: 1, title: title, description: description')
         const result = await getDailyQuestFromStorage()
@@ -140,6 +172,32 @@ describe('getHistoryFromStorage', () => {
         const result = await getHistoryFromStorage()
 
         expect(result).toStrictEqual([])
+    })
+
+    test('keeps valid daily quest when history read fails', async () => {
+        const savedDailyQuest = {
+            quest: {
+                id: 2,
+                title: 'title2',
+                description: 'description2',
+            },
+            date: formatDate(new Date()),
+            status: 'active'
+        }
+        mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
+            if (key === 'dailyQuest') {
+                return JSON.stringify(savedDailyQuest)
+            }
+            if (key === 'history') {
+                throw new Error('storage read failed')
+            }
+            return null
+        })
+        const dailyQuestResult = await getDailyQuestFromStorage()
+        const historyResult = await getHistoryFromStorage()
+
+        expect(dailyQuestResult).toStrictEqual(savedDailyQuest)
+        expect(historyResult).toStrictEqual([])
     })
 
     test('returns empty array for invalid JSON', async () => {
