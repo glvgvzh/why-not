@@ -13,6 +13,7 @@ import { getDailyQuestFromStorage, setDailyQuestInStorage } from './storage/dail
 import { getHistoryFromStorage, setHistoryInStorage } from './storage/historyStorage';
 import MainScreen from './screens/MainScreen';
 import HistoryScreen from './screens/HistoryScreen';
+import LoadingScreen from './screens/LoadingScreen';
 
 export default function App() {
 
@@ -103,7 +104,11 @@ export default function App() {
     }
   }, [history, isStorageLoaded])
 
-  if (!fontsLoaded) return null
+  if (!fontsLoaded || !isStorageLoaded) {
+    return (
+      <LoadingScreen />
+    )
+  }
 
   return (
     <SafeAreaProvider>

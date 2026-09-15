@@ -13,7 +13,7 @@ type MainScreenProps = {
 
 function MainScreen({ dailyQuest, completeQuest, changeQuest, onOpenHistory }: MainScreenProps) {
     return (
-        <View style={styles.container}>
+        <View style={styles.container} testID="mainScreen">
             <Text style={styles.appTitle}>WhyNot?</Text>
 
             <BlurView intensity={30} style={dailyQuest.status === 'active' ? styles.activeQuestCard : styles.completedQuestCard}>

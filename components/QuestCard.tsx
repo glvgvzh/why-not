@@ -35,7 +35,7 @@ function QuestCard({ currentQuest, status, completeQuest, changeQuest }: QuestCa
             }
 
             {status === 'completed' &&
-                <Text style={styles.completedText}>Выполнено</Text>
+                <Text style={styles.completedText} testID='completedQuest'>Выполнено</Text>
             }
         </>
     )
