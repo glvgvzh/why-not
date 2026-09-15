@@ -33,7 +33,11 @@ function isHistory(value: unknown): value is HistoryItem[] {
 }
 
 export async function setHistoryInStorage(history: HistoryItem[]): Promise<void> {
-    await AsyncStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history))
+    try {
+        await AsyncStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history))
+    } catch (error) {
+        console.warn('Failed to save history in storage', error)
+    }
 }
 
 export async function getHistoryFromStorage(): Promise<HistoryItem[]> {

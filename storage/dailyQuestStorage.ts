@@ -31,7 +31,11 @@ export function isDailyQuest(value: unknown): value is DailyQuest {
 }
 
 export async function setDailyQuestInStorage(dailyQuest: DailyQuest): Promise<void> {
-    await AsyncStorage.setItem(DAILY_QUEST_STORAGE_KEY, JSON.stringify(dailyQuest))
+    try {
+        await AsyncStorage.setItem(DAILY_QUEST_STORAGE_KEY, JSON.stringify(dailyQuest))
+    } catch (error) {
+        console.warn('Failed to save daily quest in storage', error)
+    }
 }
 
 export async function getDailyQuestFromStorage(): Promise<DailyQuest | null> {

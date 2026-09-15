@@ -1,18 +1,48 @@
-import { getDailyQuestFromStorage } from "../storage/dailyQuestStorage";
-import { getHistoryFromStorage } from "../storage/historyStorage";
+import { setDailyQuestInStorage, getDailyQuestFromStorage } from "../storage/dailyQuestStorage";
+import { setHistoryInStorage, getHistoryFromStorage } from "../storage/historyStorage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { formatDate } from "../utils/dailyQuest";
+import type { DailyQuest, HistoryItem } from "../types/quest";
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
-    getItem: jest.fn()
+    getItem: jest.fn(),
+    setItem: jest.fn()
 }))
 
 const mockedAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>
 
-describe('getDailyQuestFromStorage', () => {
-    beforeEach(() => {
-        jest.resetAllMocks()
+const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => { })
+
+beforeEach(() => {
+    jest.clearAllMocks()
+})
+
+afterAll(() => {
+    consoleWarnSpy.mockRestore()
+})
+
+describe('setDailyQuestInStorage', () => {
+
+    test('warns when daily quest save fails', async () => {
+        mockedAsyncStorage.setItem.mockRejectedValue(new Error('storage failed'))
+
+        const dailyQuest: DailyQuest = {
+            quest: {
+                id: 1,
+                title: 'title1',
+                description: 'description1',
+            },
+            date: formatDate(new Date()),
+            status: 'active'
+        }
+
+        await setDailyQuestInStorage(dailyQuest)
+
+        expect(consoleWarnSpy).toHaveBeenCalledWith('Failed to save daily quest in storage', expect.any(Error))
     })
+})
+
+describe('getDailyQuestFromStorage', () => {
 
     test('returns null on storage read error', async () => {
         mockedAsyncStorage.getItem.mockRejectedValue(new Error('storage failed'))
@@ -76,10 +106,34 @@ describe('getDailyQuestFromStorage', () => {
     })
 })
 
-describe('getHistoryFromStorage', () => {
-    beforeEach(() => {
-        jest.resetAllMocks()
+describe('setHistoryInStorage', () => {
+
+    test('warns when history save fails', async () => {
+        mockedAsyncStorage.setItem.mockRejectedValue(new Error('storage failed'))
+
+        const history: HistoryItem[] = [
+            {
+                date: '2026-09-10',
+                status: 'missed',
+            },
+            {
+                quest: {
+                    id: 1,
+                    title: 'title',
+                    description: 'description',
+                },
+                date: '2026-09-11',
+                status: 'completed'
+            }
+        ]
+
+        await setHistoryInStorage(history)
+
+        expect(consoleWarnSpy).toHaveBeenCalledWith('Failed to save history in storage', expect.any(Error))
     })
+})
+
+describe('getHistoryFromStorage', () => {
 
     test('returns empty array on storage read error', async () => {
         mockedAsyncStorage.getItem.mockRejectedValue(new Error('storage failed'))
