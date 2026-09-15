@@ -7,4 +7,9 @@ export const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
     },
+    loadingSafeArea: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
 })
