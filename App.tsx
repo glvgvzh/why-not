@@ -1,14 +1,14 @@
 import { styles } from './styles/app';
 import { StatusBar } from 'expo-status-bar';
-import { ImageBackground } from 'react-native';
+import { ImageBackground, AppState } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } from '@expo-google-fonts/manrope';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { getDifferentQuest, selectQuestForNewDay } from './utils/quest';
+import { getDifferentQuest } from './utils/quest';
 import { quests } from './data/quests';
-import type { DailyQuest, DateString, Quest, HistoryItem } from './types/quest';
-import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests, getMissedDays } from './utils/dailyQuest';
+import type { DailyQuest, DateString, HistoryItem } from './types/quest';
+import { formatDate, excludeClosedQuests, handleDayChange } from './utils/dailyQuest';
 import { getDailyQuestFromStorage, setDailyQuestInStorage } from './storage/dailyQuestStorage';
 import { getHistoryFromStorage, setHistoryInStorage } from './storage/historyStorage';
 import MainScreen from './screens/MainScreen';
@@ -52,38 +52,9 @@ export default function App() {
       const storageDailyQuest: DailyQuest | null = await getDailyQuestFromStorage()
       if (storageDailyQuest) {
         const currentDate: DateString = formatDate(new Date())
-
-        if (isDateChanged(storageDailyQuest.date, currentDate)) {
-          let actualHistory: HistoryItem[] = [...storageHistory]
-
-          if (storageDailyQuest.status === 'active') {
-            const finalizedDailyQuest: DailyQuest = finalizeDailyQuest(storageDailyQuest)
-            if (!actualHistory.some(historyItem => historyItem.date === finalizedDailyQuest.date)) {
-              actualHistory = [...actualHistory, finalizedDailyQuest]
-            }
-          }
-
-          const missedDays = getMissedDays(storageDailyQuest.date, currentDate)
-          for (const missedDay of missedDays) {
-            if (!actualHistory.some(historyItem => historyItem.date === missedDay)) {
-              actualHistory = [...actualHistory, { date: missedDay, status: 'missed' }]
-            }
-          }
-
-          setHistory(actualHistory)
-          const availableQuests: Quest[] = excludeClosedQuests(quests, actualHistory)
-          const newQuest: Quest = selectQuestForNewDay(availableQuests, quests, storageDailyQuest.quest)
-
-          setDailyQuest({
-            quest: newQuest,
-            date: currentDate,
-            status: 'active',
-          })
-
-        } else {
-          setDailyQuest(storageDailyQuest)
-          setHistory(storageHistory)
-        }
+        const { dailyQuest, history } = handleDayChange(storageDailyQuest, storageHistory, currentDate)
+        setHistory(history)
+        setDailyQuest(dailyQuest)
       } else {
         setHistory(storageHistory)
       }
@@ -103,6 +74,33 @@ export default function App() {
       setHistoryInStorage(history)
     }
   }, [history, isStorageLoaded])
+
+  const dailyQuestRef = useRef(dailyQuest)
+
+  useEffect(() => {
+    dailyQuestRef.current = dailyQuest
+  }, [dailyQuest])
+
+  const historyRef = useRef(history)
+
+  useEffect(() => {
+    historyRef.current = history
+  }, [history])
+
+  useEffect(() => {
+    if (!isStorageLoaded) return
+    const subscription = AppState.addEventListener('change', (newAppState) => {
+      if (newAppState === 'active') {
+        const currentDate: DateString = formatDate(new Date())
+        const { dailyQuest: actualDailyQuest, history: actualHistory } = handleDayChange(dailyQuestRef.current, historyRef.current, currentDate)
+        dailyQuestRef.current = actualDailyQuest
+        historyRef.current = actualHistory
+        setDailyQuest(actualDailyQuest)
+        setHistory(actualHistory)
+      }
+    })
+    return () => subscription.remove()
+  }, [isStorageLoaded])
 
   if (!fontsLoaded || !isStorageLoaded) {
     return (

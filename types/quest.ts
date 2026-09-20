@@ -17,4 +17,9 @@ export type MissedDay = {
   status: 'missed';
 }
 
+export type DayChangeResult = {
+  dailyQuest: DailyQuest;
+  history: HistoryItem[];
+}
+
 export type HistoryItem = DailyQuest | MissedDay

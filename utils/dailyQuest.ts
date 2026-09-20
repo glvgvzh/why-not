@@ -1,4 +1,6 @@
-import type { DateString, DailyQuest, Quest, HistoryItem } from "../types/quest"
+import type { DateString, DailyQuest, Quest, HistoryItem, DayChangeResult } from "../types/quest"
+import { quests } from "../data/quests"
+import { selectQuestForNewDay } from "./quest"
 
 export function isDateChanged(dailyQuestDate: DateString, currentDate: DateString): boolean {
     return dailyQuestDate !== currentDate
@@ -32,4 +34,40 @@ export function getMissedDays(firstDate: DateString, currentDate: DateString): D
         iterDay.setDate(iterDay.getDate() + 1)
     }
     return missedDays
+}
+
+export function handleDayChange(dailyQuest: DailyQuest, history: HistoryItem[], currentDate: DateString): DayChangeResult {
+    if (!isDateChanged(dailyQuest.date, currentDate)) {
+        return {
+            dailyQuest,
+            history,
+        }
+    }
+    let actualHistory: HistoryItem[] = [...history]
+
+    if (dailyQuest.status === 'active') {
+        const finalizedDailyQuest: DailyQuest = finalizeDailyQuest(dailyQuest)
+        if (!actualHistory.some(historyItem => historyItem.date === finalizedDailyQuest.date)) {
+            actualHistory = [...actualHistory, finalizedDailyQuest]
+        }
+    }
+
+    const missedDays = getMissedDays(dailyQuest.date, currentDate)
+    for (const missedDay of missedDays) {
+        if (!actualHistory.some(historyItem => historyItem.date === missedDay)) {
+            actualHistory = [...actualHistory, { date: missedDay, status: 'missed' }]
+        }
+    }
+
+    const availableQuests: Quest[] = excludeClosedQuests(quests, actualHistory)
+    const newQuest: Quest = selectQuestForNewDay(availableQuests, quests, dailyQuest.quest)
+
+    return {
+        dailyQuest: {
+            quest: newQuest,
+            date: currentDate,
+            status: 'active',
+        },
+        history: actualHistory,
+    }
 }
