@@ -3,6 +3,7 @@ import App from "../App";
 import { render, waitFor } from "@testing-library/react-native";
 import type { DailyQuest, HistoryItem } from "../types/quest";
 import { formatDate } from "../utils/dailyQuest";
+import { AppState } from "react-native";
 
 jest.mock('@expo-google-fonts/manrope', () => ({
     useFonts: () => [true],
@@ -18,27 +19,31 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
     setItem: jest.fn()
 }))
 
+const appStateSpy = jest.spyOn(AppState, 'addEventListener').mockReturnValue({
+    remove: jest.fn()
+})
+
+afterAll(() => {
+    appStateSpy.mockRestore()
+})
+
 const mockedAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>
 
 describe('App', () => {
     beforeEach(() => {
-        jest.resetAllMocks()
+        jest.clearAllMocks()
     })
 
     test('shows loader until storage is loaded', async () => {
         mockedAsyncStorage.getItem.mockImplementation(() => new Promise(() => { }))
-        const { queryByTestId, getByTestId } = await render(
-            <App />
-        )
+        const { queryByTestId, getByTestId } = await render(<App />)
         expect(getByTestId('loader')).toBeTruthy()
         expect(queryByTestId('mainScreen')).toBeNull()
     })
 
     test('shows main screen after storage is loaded', async () => {
         mockedAsyncStorage.getItem.mockResolvedValue(null)
-        const { queryByTestId, getByTestId } = await render(
-            <App />
-        )
+        const { queryByTestId, getByTestId } = await render(<App />)
         await waitFor(() => {
             expect(getByTestId('mainScreen')).toBeTruthy()
             expect(queryByTestId('loader')).toBeNull()
@@ -79,9 +84,7 @@ describe('App', () => {
             }
             return null
         })
-        const { queryByTestId, getByTestId, getByText } = await render(
-            <App />
-        )
+        const { queryByTestId, getByTestId, getByText } = await render(<App />)
         await waitFor(() => {
             expect(getByTestId('mainScreen')).toBeTruthy()
             expect(getByText('title2')).toBeTruthy()
@@ -124,9 +127,7 @@ describe('App', () => {
             }
             return null
         })
-        const { queryByTestId, getByTestId, queryByText, getByText } = await render(
-            <App />
-        )
+        const { queryByTestId, getByTestId, queryByText, getByText } = await render(<App />)
         await waitFor(() => {
             expect(getByTestId('mainScreen')).toBeTruthy()
             expect(getByText('title2')).toBeTruthy()

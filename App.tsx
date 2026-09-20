@@ -1,9 +1,9 @@
 import { styles } from './styles/app';
 import { StatusBar } from 'expo-status-bar';
-import { ImageBackground } from 'react-native';
+import { ImageBackground, AppState } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } from '@expo-google-fonts/manrope';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { getDifferentQuest } from './utils/quest';
 import { quests } from './data/quests';
@@ -53,7 +53,6 @@ export default function App() {
       if (storageDailyQuest) {
         const currentDate: DateString = formatDate(new Date())
         const { dailyQuest, history } = handleDayChange(storageDailyQuest, storageHistory, currentDate)
-
         setHistory(history)
         setDailyQuest(dailyQuest)
       } else {
@@ -75,6 +74,33 @@ export default function App() {
       setHistoryInStorage(history)
     }
   }, [history, isStorageLoaded])
+
+  const dailyQuestRef = useRef(dailyQuest)
+
+  useEffect(() => {
+    dailyQuestRef.current = dailyQuest
+  }, [dailyQuest])
+
+  const historyRef = useRef(history)
+
+  useEffect(() => {
+    historyRef.current = history
+  }, [history])
+
+  useEffect(() => {
+    if (!isStorageLoaded) return
+    const subscription = AppState.addEventListener('change', (newAppState) => {
+      if (newAppState === 'active') {
+        const currentDate: DateString = formatDate(new Date())
+        const { dailyQuest: actualDailyQuest, history: actualHistory } = handleDayChange(dailyQuestRef.current, historyRef.current, currentDate)
+        dailyQuestRef.current = actualDailyQuest
+        historyRef.current = actualHistory
+        setDailyQuest(actualDailyQuest)
+        setHistory(actualHistory)
+      }
+    })
+    return () => subscription.remove()
+  }, [isStorageLoaded])
 
   if (!fontsLoaded || !isStorageLoaded) {
     return (

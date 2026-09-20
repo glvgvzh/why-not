@@ -1,5 +1,5 @@
 import type { DateString, DailyQuest, Quest, HistoryItem } from "../types/quest";
-import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests, getMissedDays } from "../utils/dailyQuest";
+import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests, getMissedDays, handleDayChange } from "../utils/dailyQuest";
 
 describe('formatDate', () => {
     test('formats date with leading zeros', () => {
@@ -277,7 +277,7 @@ describe('getMissedDays', () => {
         const currentDate: DateString = '2026-09-02'
         expect(getMissedDays(firstDate, currentDate)).toStrictEqual([])
     })
-    
+
     test('returns missed days with changed month', () => {
         const firstDate: DateString = '2026-09-29'
         const currentDate: DateString = '2026-10-02'
@@ -295,6 +295,245 @@ describe('getMissedDays', () => {
             '2026-12-31',
             '2027-01-01',
             '2027-01-02'
+        ])
+    })
+})
+
+describe('handleDayChange', () => {
+    test('returns the same dailyQuest & history if the day has not changed', () => {
+        const dailyQuest: DailyQuest = {
+            quest: {
+                id: 2,
+                title: 'title2',
+                description: 'description2',
+            },
+            date: '2026-09-17',
+            status: 'active',
+        }
+        const history: HistoryItem[] = [
+            {
+                quest: {
+                    id: 1,
+                    title: 'title1',
+                    description: 'description1',
+                },
+                date: '2026-09-16',
+                status: 'missed',
+            },
+        ]
+        const currentDate: DateString = '2026-09-17'
+        const result = handleDayChange(dailyQuest, history, currentDate)
+        expect(result.dailyQuest).toBe(dailyQuest)
+        expect(result.history).toBe(history)
+    })
+
+    test('returns new dailyQuest & history if the day has changed to next day', () => {
+        const dailyQuest: DailyQuest = {
+            quest: {
+                id: 2,
+                title: 'title2',
+                description: 'description2',
+            },
+            date: '2026-09-17',
+            status: 'active',
+        }
+        const history: HistoryItem[] = [
+            {
+                quest: {
+                    id: 1,
+                    title: 'title1',
+                    description: 'description1',
+                },
+                date: '2026-09-16',
+                status: 'missed',
+            },
+        ]
+        const currentDate: DateString = '2026-09-18'
+        const result = handleDayChange(dailyQuest, history, currentDate)
+        expect(result.dailyQuest.date).toBe('2026-09-18')
+        expect(result.dailyQuest.status).toBe('active')
+        expect(result.history).toStrictEqual([...history, { ...dailyQuest, status: 'missed' }])
+    })
+
+    test('returns new dailyQuest & new missed days in history if a few days have passed', () => {
+        const dailyQuest: DailyQuest = {
+            quest: {
+                id: 2,
+                title: 'title2',
+                description: 'description2',
+            },
+            date: '2026-09-17',
+            status: 'active',
+        }
+        const history: HistoryItem[] = [
+            {
+                quest: {
+                    id: 1,
+                    title: 'title1',
+                    description: 'description1',
+                },
+                date: '2026-09-16',
+                status: 'missed',
+            },
+        ]
+        const currentDate: DateString = '2026-09-20'
+        const result = handleDayChange(dailyQuest, history, currentDate)
+        expect(result.dailyQuest.date).toBe('2026-09-20')
+        expect(result.dailyQuest.status).toBe('active')
+        expect(result.history).toStrictEqual([
+            ...history,
+            {
+                ...dailyQuest,
+                status: 'missed'
+            },
+            {
+                date: '2026-09-18',
+                status: 'missed',
+            },
+            {
+                date: '2026-09-19',
+                status: 'missed',
+            },
+        ])
+    })
+
+    test('a completed quest does not turn into a missed one', () => {
+        const dailyQuest: DailyQuest = {
+            quest: {
+                id: 2,
+                title: 'title2',
+                description: 'description2',
+            },
+            date: '2026-09-17',
+            status: 'completed',
+        }
+        const history: HistoryItem[] = [
+            {
+                quest: {
+                    id: 1,
+                    title: 'title1',
+                    description: 'description1',
+                },
+                date: '2026-09-16',
+                status: 'completed',
+            },
+            {
+                quest: {
+                    id: 2,
+                    title: 'title2',
+                    description: 'description2',
+                },
+                date: '2026-09-17',
+                status: 'completed',
+            }
+        ]
+        const currentDate: DateString = '2026-09-18'
+        const result = handleDayChange(dailyQuest, history, currentDate)
+        expect(result.dailyQuest.date).toBe('2026-09-18')
+        expect(result.dailyQuest.status).toBe('active')
+        expect(result.history).toStrictEqual(history)
+    })
+
+    test('does not add duplicate dates to history', () => {
+        const dailyQuest: DailyQuest = {
+            quest: {
+                id: 2,
+                title: 'title2',
+                description: 'description2',
+            },
+            date: '2026-09-17',
+            status: 'completed',
+        }
+        const history: HistoryItem[] = [
+            {
+                date: '2026-09-18',
+                status: 'missed',
+            }
+        ]
+        const currentDate: DateString = '2026-09-20'
+        const result = handleDayChange(dailyQuest, history, currentDate)
+        const duplicates = result.history.filter(item => item.date === '2026-09-18')
+        expect(duplicates).toHaveLength(1)
+        expect(result.history.some(item => item.date === '2026-09-19')).toBe(true)
+        expect(result.dailyQuest.date).toBe('2026-09-20')
+        expect(result.dailyQuest.status).toBe('active')
+    })
+
+    test('handles day change across month boundary', () => {
+        const dailyQuest: DailyQuest = {
+            quest: {
+                id: 2,
+                title: 'title2',
+                description: 'description2',
+            },
+            date: '2026-09-29',
+            status: 'active',
+        }
+        const history: HistoryItem[] = []
+        const currentDate: DateString = '2026-10-02'
+        const result = handleDayChange(dailyQuest, history, currentDate)
+
+        expect(result.dailyQuest.date).toBe('2026-10-02')
+        expect(result.dailyQuest.status).toBe('active')
+        expect(result.history).toStrictEqual([
+            {
+                quest: {
+                    id: 2,
+                    title: 'title2',
+                    description: 'description2',
+                },
+                date: '2026-09-29',
+                status: 'missed',
+            },
+            {
+                date: '2026-09-30',
+                status: 'missed',
+            },
+            {
+                date: '2026-10-01',
+                status: 'missed',
+            },
+        ])
+    })
+
+    test('handles day change across year boundary', () => {
+        const dailyQuest: DailyQuest = {
+            quest: {
+                id: 2,
+                title: 'title2',
+                description: 'description2',
+            },
+            date: '2026-12-29',
+            status: 'active',
+        }
+        const history: HistoryItem[] = []
+        const currentDate: DateString = '2027-01-02'
+        const result = handleDayChange(dailyQuest, history, currentDate)
+
+        expect(result.dailyQuest.date).toBe('2027-01-02')
+        expect(result.dailyQuest.status).toBe('active')
+        expect(result.history).toStrictEqual([
+            {
+                quest: {
+                    id: 2,
+                    title: 'title2',
+                    description: 'description2',
+                },
+                date: '2026-12-29',
+                status: 'missed',
+            },
+            {
+                date: '2026-12-30',
+                status: 'missed',
+            },
+            {
+                date: '2026-12-31',
+                status: 'missed',
+            },
+            {
+                date: '2027-01-01',
+                status: 'missed',
+            },
         ])
     })
 })
