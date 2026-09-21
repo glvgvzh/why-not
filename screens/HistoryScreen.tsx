@@ -20,7 +20,9 @@ function HistoryScreen({ history, onBack }: HistoryScreenProps) {
         <>
             <View style={styles.container} testID="historyScreen">
                 <Text style={styles.title}>История</Text>
-                <Text style={styles.completedQuestsCount}>Выполнено: {completedQuestsCount}</Text>
+                {history.length > 0 &&
+                    <Text style={styles.completedQuestsCount}>Выполнено: {completedQuestsCount}</Text>
+                }
                 <ScrollView style={styles.mainPart}>
                     <HistoryList history={history} />
                 </ScrollView>

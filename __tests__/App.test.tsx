@@ -203,4 +203,18 @@ describe('App', () => {
         fireEvent.press(await findByText('История'))
         expect(await findByText('Выполнено: 2')).toBeTruthy()
     })
+
+    test('does not show completed quests count for empty history', async () => {
+        const savedHistory: HistoryItem[] = []
+        mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
+            if (key === 'history') {
+                return JSON.stringify(savedHistory)
+            }
+            return null
+        })
+        const { findByText, queryByText } = await render(<App />)
+        fireEvent.press(await findByText('История'))
+        await findByText('История пока пуста')
+        expect(queryByText(/Выполнено:/i)).toBeNull()
+    })
 })
