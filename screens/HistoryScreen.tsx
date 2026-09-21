@@ -18,7 +18,7 @@ function HistoryScreen({ history, onBack }: HistoryScreenProps) {
 
     return (
         <>
-            <View style={styles.container}>
+            <View style={styles.container} testID="historyScreen">
                 <Text style={styles.title}>История</Text>
                 <Text style={styles.completedQuestsCount}>Выполнено: {completedQuestsCount}</Text>
                 <ScrollView style={styles.mainPart}>
