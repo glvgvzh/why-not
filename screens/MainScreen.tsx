@@ -17,7 +17,7 @@ function MainScreen({ dailyQuest, completeQuest, changeQuest, onOpenHistory }: M
             <Text style={styles.appTitle}>WhyNot?</Text>
 
             <BlurView intensity={30} style={dailyQuest.status === 'active' ? styles.activeQuestCard : styles.completedQuestCard}>
-                <QuestCard currentQuest={dailyQuest.quest} status={dailyQuest.status} completeQuest={completeQuest} changeQuest={changeQuest} />
+                <QuestCard dailyQuest={dailyQuest} completeQuest={completeQuest} changeQuest={changeQuest} />
             </BlurView>
 
             <BlurView intensity={30} style={styles.historyButtonBlur}>
