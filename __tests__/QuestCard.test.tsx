@@ -71,4 +71,25 @@ describe('QuestCard', () => {
         fireEvent.press(getByText('Заменить'))
         expect(changeQuest).toHaveBeenCalledTimes(1)
     })
+
+    test('shows formatted date in quest card', async () => {
+        const dailyQuest: DailyQuest = {
+            quest: {
+                id: 1,
+                title: 'Квест 1',
+                description: 'Описание 1',
+            },
+            date: '2026-09-09',
+            status: 'active',
+        }
+        const { getByText, queryByText } = await render(
+            <QuestCard
+                dailyQuest={dailyQuest}
+                completeQuest={() => { }}
+                changeQuest={() => { }}
+            />
+        )
+        expect(getByText('09.09.2026')).toBeTruthy()
+        expect(queryByText('2026-09-09')).toBeNull()
+    })
 })

@@ -154,4 +154,53 @@ describe('App', () => {
         fireEvent.press(getByText('Назад'))
         expect(await findByTestId('mainScreen')).toBeTruthy()
     })
+
+    test('shows empty history state', async () => {
+        const savedHistory: HistoryItem[] = []
+        mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
+            if (key === 'history') {
+                return JSON.stringify(savedHistory)
+            }
+            return null
+        })
+        const { findByText } = await render(<App />)
+        fireEvent.press(await findByText('История'))
+        expect(await findByText('История пока пуста')).toBeTruthy()
+    })
+
+    test('shows completed quests count', async () => {
+        const savedHistory: HistoryItem[] = [
+            {
+                date: '2026-09-13',
+                status: 'missed',
+            },
+            {
+                quest: {
+                    id: 1,
+                    title: 'title1',
+                    description: 'description1',
+                },
+                date: '2026-09-14',
+                status: 'completed',
+            },
+            {
+                quest: {
+                    id: 2,
+                    title: 'title2',
+                    description: 'description2',
+                },
+                date: '2026-09-15',
+                status: 'completed',
+            },
+        ]
+        mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
+            if (key === 'history') {
+                return JSON.stringify(savedHistory)
+            }
+            return null
+        })
+        const { findByText } = await render(<App />)
+        fireEvent.press(await findByText('История'))
+        expect(await findByText('Выполнено: 2')).toBeTruthy()
+    })
 })
