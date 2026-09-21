@@ -9,10 +9,18 @@ type HistoryScreenProps = {
 }
 
 function HistoryScreen({ history, onBack }: HistoryScreenProps) {
+    const completedQuestsCount: number = history.reduce((acc, historyItem) => {
+        if (historyItem.status === 'completed') {
+            acc++
+        }
+        return acc
+    }, 0)
+
     return (
         <>
             <View style={styles.container}>
                 <Text style={styles.title}>История</Text>
+                <Text style={styles.completedQuestsCount}>Выполнено: {completedQuestsCount}</Text>
                 <ScrollView style={styles.mainPart}>
                     <HistoryList history={history} />
                 </ScrollView>
