@@ -10,6 +10,12 @@ export const styles = StyleSheet.create({
         fontFamily: 'Manrope_600SemiBold',
         alignSelf: 'center',
     },
+    completedQuestsCount: {
+        color: 'rgba(0, 0, 0, 0.4)',
+        alignSelf: 'center',
+        fontFamily: 'Manrope_400Regular',
+        fontSize: 12,
+    },
     mainPart: {
         flex: 1,
         marginVertical: 16,
