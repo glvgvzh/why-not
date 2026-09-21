@@ -1,22 +1,25 @@
-import { Pressable, Text } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { styles } from '../styles/mainScreen';
-import type { Quest, DailyQuest } from '../types/quest';
+import type { DailyQuest } from '../types/quest';
+import { formatDateForUI } from '../utils/dailyQuest';
 
 type QuestCardProps = {
-    currentQuest: Quest;
-    status: DailyQuest['status'];
+    dailyQuest: DailyQuest;
     completeQuest: () => void;
     changeQuest: () => void;
 }
 
-function QuestCard({ currentQuest, status, completeQuest, changeQuest }: QuestCardProps) {
+function QuestCard({ dailyQuest, completeQuest, changeQuest }: QuestCardProps) {
     return (
         <>
-            <Text style={styles.questLabel}>Опыт дня</Text>
-            <Text style={styles.questTitle}>{currentQuest.title}</Text>
-            <Text style={styles.questDescription}>{currentQuest.description}</Text>
+            <View style={styles.header}>
+                <Text style={styles.questLabel}>Опыт дня</Text>
+                <Text style={styles.questLabel}>{formatDateForUI(dailyQuest.date)}</Text>
+            </View>
+            <Text style={styles.questTitle}>{dailyQuest.quest.title}</Text>
+            <Text style={styles.questDescription}>{dailyQuest.quest.description}</Text>
 
-            {status === 'active' &&
+            {dailyQuest.status === 'active' &&
                 <>
                     <Pressable
                         style={styles.primaryButton}
@@ -34,7 +37,7 @@ function QuestCard({ currentQuest, status, completeQuest, changeQuest }: QuestCa
                 </>
             }
 
-            {status === 'completed' &&
+            {dailyQuest.status === 'completed' &&
                 <Text style={styles.completedText} testID='completedQuest'>Выполнено</Text>
             }
         </>

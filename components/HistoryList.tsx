@@ -1,15 +1,11 @@
 import { styles } from "../styles/historyScreen";
 import { Text, View } from 'react-native';
-import type { DateString, HistoryItem } from "../types/quest"
+import type { HistoryItem } from "../types/quest"
+import { formatDateForUI } from "../utils/dailyQuest";
 import { BlurView } from "expo-blur";
 
 type HistoryListProps = {
     history: HistoryItem[]
-}
-
-function formatDateForUI(date: DateString): string {
-    const dateParts = date.split('-')
-    return `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`
 }
 
 function HistoryList({ history }: HistoryListProps) {

@@ -21,10 +21,15 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 24,
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   questLabel: {
     fontSize: 14,
     marginBottom: 8,
     fontFamily: 'Manrope_500Medium',
+    color: 'rgba(0, 0, 0, 0.5)'
   },
   questTitle: {
     fontSize: 24,

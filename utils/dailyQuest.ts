@@ -13,6 +13,11 @@ export function formatDate(date: Date): DateString {
     return `${year}-${month}-${day}` as DateString
 }
 
+export function formatDateForUI(date: DateString): string {
+    const dateParts = date.split('-')
+    return `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`
+}
+
 export function finalizeDailyQuest(dailyQuest: DailyQuest): DailyQuest {
     if (dailyQuest.status === 'active') {
         return { ...dailyQuest, status: 'missed' }

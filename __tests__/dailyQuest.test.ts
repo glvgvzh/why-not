@@ -1,5 +1,5 @@
 import type { DateString, DailyQuest, Quest, HistoryItem } from "../types/quest";
-import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests, getMissedDays, handleDayChange } from "../utils/dailyQuest";
+import { isDateChanged, formatDate, finalizeDailyQuest, excludeClosedQuests, getMissedDays, handleDayChange, formatDateForUI } from "../utils/dailyQuest";
 
 describe('formatDate', () => {
     test('formats date with leading zeros', () => {
@@ -535,5 +535,13 @@ describe('handleDayChange', () => {
                 status: 'missed',
             },
         ])
+    })
+})
+
+describe('formatDateForUI', () => {
+    test('formats date from YYYY-MM-DD to DD.MM.YYYY', () => {
+        const date: DateString = '2026-09-21'
+        const formattedDate = formatDateForUI(date)
+        expect(formattedDate).toBe('21.09.2026')
     })
 })
