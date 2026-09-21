@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import App from "../App";
-import { render, waitFor } from "@testing-library/react-native";
+import { render, waitFor, fireEvent } from "@testing-library/react-native";
 import type { DailyQuest, HistoryItem } from "../types/quest";
 import { formatDate } from "../utils/dailyQuest";
 import { AppState } from "react-native";
@@ -17,6 +17,10 @@ jest.mock('react-native-safe-area-context', () => require('react-native-safe-are
 jest.mock('@react-native-async-storage/async-storage', () => ({
     getItem: jest.fn(),
     setItem: jest.fn()
+}))
+
+jest.mock('expo-blur', () => ({
+    BlurView: require('react-native').View
 }))
 
 const appStateSpy = jest.spyOn(AppState, 'addEventListener').mockReturnValue({
@@ -139,5 +143,15 @@ describe('App', () => {
             expect(queryByText('Выполнить')).toBeNull()
             expect(queryByText('Заменить')).toBeNull()
         })
+    })
+
+    test('navigates from main screen to history and back', async () => {
+        mockedAsyncStorage.getItem.mockResolvedValue(null)
+        const { getByText, findByTestId } = await render(<App />)
+        expect(await findByTestId('mainScreen')).toBeTruthy()
+        fireEvent.press(getByText('История'))
+        expect(await findByTestId('historyScreen')).toBeTruthy()
+        fireEvent.press(getByText('Назад'))
+        expect(await findByTestId('mainScreen')).toBeTruthy()
     })
 })
