@@ -48,4 +48,27 @@ describe('QuestCard', () => {
         fireEvent.press(getByText('Выполнить'))
         expect(completeQuest).toHaveBeenCalledTimes(1)
     })
+
+    test('calls changeQuest when change button is pressed', async () => {
+        const dailyQuest: DailyQuest = {
+            quest: {
+                id: 1,
+                title: 'Квест 1',
+                description: 'Описание 1',
+            },
+            date: '2026-09-09',
+            status: 'active',
+        }
+        const changeQuest = jest.fn()
+        const { getByText } = await render(
+            <QuestCard
+                dailyQuest={dailyQuest}
+                completeQuest={() => { }}
+                changeQuest={changeQuest}
+            />
+        )
+
+        fireEvent.press(getByText('Заменить'))
+        expect(changeQuest).toHaveBeenCalledTimes(1)
+    })
 })
