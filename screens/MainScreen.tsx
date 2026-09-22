@@ -9,15 +9,16 @@ type MainScreenProps = {
     completeQuest: () => void;
     changeQuest: () => void;
     onOpenHistory: () => void;
+    canReplaceQuest: boolean;
 }
 
-function MainScreen({ dailyQuest, completeQuest, changeQuest, onOpenHistory }: MainScreenProps) {
+function MainScreen({ dailyQuest, completeQuest, changeQuest, onOpenHistory, canReplaceQuest }: MainScreenProps) {
     return (
         <View style={styles.container} testID="mainScreen">
             <Text style={styles.appTitle}>WhyNot?</Text>
 
             <BlurView intensity={30} style={dailyQuest.status === 'active' ? styles.activeQuestCard : styles.completedQuestCard}>
-                <QuestCard dailyQuest={dailyQuest} completeQuest={completeQuest} changeQuest={changeQuest} />
+                <QuestCard dailyQuest={dailyQuest} completeQuest={completeQuest} changeQuest={changeQuest} canReplaceQuest={canReplaceQuest} />
             </BlurView>
 
             <BlurView intensity={30} style={styles.historyButtonBlur}>
