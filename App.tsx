@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { getDifferentQuest } from './utils/quest';
 import { quests } from './data/quests';
-import type { DailyQuest, DateString, HistoryItem } from './types/quest';
+import type { DailyQuest, DateString, HistoryItem, Quest } from './types/quest';
 import { formatDate, excludeClosedQuests, handleDayChange } from './utils/dailyQuest';
 import { getDailyQuestFromStorage, setDailyQuestInStorage } from './storage/dailyQuestStorage';
 import { getHistoryFromStorage, setHistoryInStorage } from './storage/historyStorage';
@@ -32,8 +32,10 @@ export default function App() {
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [currentScreen, setCurrentScreen] = useState<'main' | 'history'>('main')
 
+  const availableQuests: Quest[] = excludeClosedQuests(quests, history)
+  const canReplaceQuest: boolean = availableQuests.some(quest => quest.id !== dailyQuest.quest.id)
+
   function changeQuest(): void {
-    const availableQuests = excludeClosedQuests(quests, history)
     const newQuest = getDifferentQuest(availableQuests, dailyQuest.quest)
     if (newQuest === null) return
     setDailyQuest({ ...dailyQuest, quest: newQuest })
@@ -122,6 +124,7 @@ export default function App() {
               completeQuest={completeQuest}
               changeQuest={changeQuest}
               onOpenHistory={() => setCurrentScreen('history')}
+              canReplaceQuest={canReplaceQuest}
             />
           }
           {currentScreen === 'history' &&

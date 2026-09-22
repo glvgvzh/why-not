@@ -81,6 +81,11 @@ export const styles = StyleSheet.create({
     fontFamily: 'Manrope_500Medium',
     fontSize: 16,
   },
+  secondaryButtonTextDisabled: {
+    fontFamily: 'Manrope_500Medium',
+    fontSize: 16,
+    opacity: .5,
+  },
   historyButtonBlur: {
     alignSelf: 'center',
     borderRadius: 16,

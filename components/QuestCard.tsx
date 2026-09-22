@@ -7,9 +7,10 @@ type QuestCardProps = {
     dailyQuest: DailyQuest;
     completeQuest: () => void;
     changeQuest: () => void;
+    canReplaceQuest: boolean;
 }
 
-function QuestCard({ dailyQuest, completeQuest, changeQuest }: QuestCardProps) {
+function QuestCard({ dailyQuest, completeQuest, changeQuest, canReplaceQuest }: QuestCardProps) {
     return (
         <>
             <View style={styles.header}>
@@ -31,8 +32,14 @@ function QuestCard({ dailyQuest, completeQuest, changeQuest }: QuestCardProps) {
                     <Pressable
                         style={styles.secondaryButton}
                         onPress={changeQuest}
+                        disabled={!canReplaceQuest}
+                        testID='changeButton'
                     >
-                        <Text style={styles.secondaryButtonText}>Заменить</Text>
+                        {canReplaceQuest
+                            ? <Text style={styles.secondaryButtonText}>Заменить</Text>
+                            : <Text style={styles.secondaryButtonTextDisabled}>Нет доступных квестов</Text>
+                        }
+
                     </Pressable>
                 </>
             }

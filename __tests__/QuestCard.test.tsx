@@ -18,6 +18,7 @@ describe('QuestCard', () => {
                 dailyQuest={dailyQuest}
                 completeQuest={() => { }}
                 changeQuest={() => { }}
+                canReplaceQuest={true}
             />
         )
 
@@ -42,6 +43,7 @@ describe('QuestCard', () => {
                 dailyQuest={dailyQuest}
                 completeQuest={completeQuest}
                 changeQuest={() => { }}
+                canReplaceQuest={true}
             />
         )
 
@@ -65,6 +67,7 @@ describe('QuestCard', () => {
                 dailyQuest={dailyQuest}
                 completeQuest={() => { }}
                 changeQuest={changeQuest}
+                canReplaceQuest={true}
             />
         )
 
@@ -87,9 +90,33 @@ describe('QuestCard', () => {
                 dailyQuest={dailyQuest}
                 completeQuest={() => { }}
                 changeQuest={() => { }}
+                canReplaceQuest={true}
             />
         )
         expect(getByText('09.09.2026')).toBeTruthy()
         expect(queryByText('2026-09-09')).toBeNull()
+    })
+
+    test('shows disabled change button', async () => {
+        const dailyQuest: DailyQuest = {
+            quest: {
+                id: 1,
+                title: 'Квест 1',
+                description: 'Описание 1',
+            },
+            date: '2026-09-09',
+            status: 'active',
+        }
+        const { getByText, queryByText, getByTestId } = await render(
+            <QuestCard
+                dailyQuest={dailyQuest}
+                completeQuest={() => { }}
+                changeQuest={() => { }}
+                canReplaceQuest={false}
+            />
+        )
+        expect(queryByText('Заменить')).toBeNull()
+        expect(getByText('Нет доступных квестов')).toBeTruthy()
+        expect(getByTestId('changeButton')).toBeDisabled()
     })
 })
