@@ -217,4 +217,44 @@ describe('App', () => {
         await findByText('История пока пуста')
         expect(queryByText(/Выполнено:/i)).toBeNull()
     })
+
+    test('completes quest and adds it to history', async () => {
+        const savedDailyQuest: DailyQuest = {
+            quest: {
+                id: 2,
+                title: 'title2',
+                description: 'description2',
+            },
+            date: formatDate(new Date()),
+            status: 'active',
+        }
+        const savedHistory: HistoryItem[] = []
+        mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
+            if (key === 'dailyQuest') {
+                return JSON.stringify(savedDailyQuest)
+            }
+            if (key === 'history') {
+                return JSON.stringify(savedHistory)
+            }
+            return null
+        })
+        const { findByText, queryByText, getByText } = await render(<App />)
+
+        expect(await findByText('title2')).toBeTruthy()
+        expect(getByText('description2')).toBeTruthy()
+        expect(getByText('Выполнить')).toBeTruthy()
+        expect(getByText('Заменить')).toBeTruthy()
+
+        fireEvent.press(getByText('Выполнить'))
+
+        expect(await findByText('Выполнено')).toBeTruthy()
+        expect(queryByText('Выполнить')).toBeNull()
+        expect(queryByText('Заменить')).toBeNull()
+
+        fireEvent.press(getByText('История'))
+
+        expect(await findByText('Выполнено: 1')).toBeTruthy()
+        expect(getByText('title2')).toBeTruthy()
+        expect(getByText('description2')).toBeTruthy()
+    })
 })
