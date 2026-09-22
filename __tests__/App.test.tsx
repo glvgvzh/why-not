@@ -257,4 +257,34 @@ describe('App', () => {
         expect(getByText('title2')).toBeTruthy()
         expect(getByText('description2')).toBeTruthy()
     })
+
+    test('saves completed quest and updated history to AsyncStorage', async () => {
+        const savedDailyQuest: DailyQuest = {
+            quest: {
+                id: 2,
+                title: 'title2',
+                description: 'description2',
+            },
+            date: formatDate(new Date()),
+            status: 'active',
+        }
+        const savedHistory: HistoryItem[] = []
+        mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
+            if (key === 'dailyQuest') {
+                return JSON.stringify(savedDailyQuest)
+            }
+            if (key === 'history') {
+                return JSON.stringify(savedHistory)
+            }
+            return null
+        })
+
+        const { findByText } = await render(<App />)
+
+        fireEvent.press(await findByText('Выполнить'))
+        await waitFor(() => {
+            expect(mockedAsyncStorage.setItem).toHaveBeenCalledWith('dailyQuest', JSON.stringify({ ...savedDailyQuest, status: 'completed' }))
+            expect(mockedAsyncStorage.setItem).toHaveBeenCalledWith('history', JSON.stringify([{ ...savedDailyQuest, status: 'completed' }]))
+        })
+    })
 })
