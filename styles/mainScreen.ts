@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native'
 
 export const styles = StyleSheet.create({
   container: {
@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 8,
     fontFamily: 'Manrope_500Medium',
-    color: 'rgba(0, 0, 0, 0.5)'
+    color: 'rgba(0, 0, 0, 0.5)',
   },
   questTitle: {
     fontSize: 24,
@@ -84,11 +84,11 @@ export const styles = StyleSheet.create({
   secondaryButtonTextDisabled: {
     fontFamily: 'Manrope_500Medium',
     fontSize: 16,
-    opacity: .5,
+    opacity: 0.5,
   },
   historyButtonBlur: {
     alignSelf: 'center',
     borderRadius: 16,
     overflow: 'hidden',
-  }
-});
+  },
+})

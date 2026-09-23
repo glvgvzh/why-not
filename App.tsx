@@ -1,22 +1,26 @@
-import { styles } from './styles/app';
-import { StatusBar } from 'expo-status-bar';
-import { ImageBackground, AppState } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { useFonts, Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold } from '@expo-google-fonts/manrope';
-import { useEffect, useRef, useState } from 'react';
+import { styles } from './styles/app'
+import { StatusBar } from 'expo-status-bar'
+import { ImageBackground, AppState } from 'react-native'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import {
+  useFonts,
+  Manrope_400Regular,
+  Manrope_500Medium,
+  Manrope_600SemiBold,
+} from '@expo-google-fonts/manrope'
+import { useEffect, useRef, useState } from 'react'
 
-import { getDifferentQuest } from './utils/quest';
-import { quests } from './data/quests';
-import type { DailyQuest, DateString, HistoryItem, Quest } from './types/quest';
-import { formatDate, excludeClosedQuests, handleDayChange } from './utils/dailyQuest';
-import { getDailyQuestFromStorage, setDailyQuestInStorage } from './storage/dailyQuestStorage';
-import { getHistoryFromStorage, setHistoryInStorage } from './storage/historyStorage';
-import MainScreen from './screens/MainScreen';
-import HistoryScreen from './screens/HistoryScreen';
-import LoadingScreen from './screens/LoadingScreen';
+import { getDifferentQuest } from './utils/quest'
+import { quests } from './data/quests'
+import type { DailyQuest, DateString, HistoryItem, Quest } from './types/quest'
+import { formatDate, excludeClosedQuests, handleDayChange } from './utils/dailyQuest'
+import { getDailyQuestFromStorage, setDailyQuestInStorage } from './storage/dailyQuestStorage'
+import { getHistoryFromStorage, setHistoryInStorage } from './storage/historyStorage'
+import MainScreen from './screens/MainScreen'
+import HistoryScreen from './screens/HistoryScreen'
+import LoadingScreen from './screens/LoadingScreen'
 
 export default function App() {
-
   const [fontsLoaded] = useFonts({
     Manrope_400Regular,
     Manrope_500Medium,
@@ -33,7 +37,7 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'main' | 'history'>('main')
 
   const availableQuests: Quest[] = excludeClosedQuests(quests, history)
-  const canReplaceQuest: boolean = availableQuests.some(quest => quest.id !== dailyQuest.quest.id)
+  const canReplaceQuest: boolean = availableQuests.some((quest) => quest.id !== dailyQuest.quest.id)
 
   function changeQuest(): void {
     const newQuest = getDifferentQuest(availableQuests, dailyQuest.quest)
@@ -54,7 +58,11 @@ export default function App() {
       const storageDailyQuest: DailyQuest | null = await getDailyQuestFromStorage()
       if (storageDailyQuest) {
         const currentDate: DateString = formatDate(new Date())
-        const { dailyQuest, history } = handleDayChange(storageDailyQuest, storageHistory, currentDate)
+        const { dailyQuest, history } = handleDayChange(
+          storageDailyQuest,
+          storageHistory,
+          currentDate,
+        )
         setHistory(history)
         setDailyQuest(dailyQuest)
       } else {
@@ -94,7 +102,11 @@ export default function App() {
     const subscription = AppState.addEventListener('change', (newAppState) => {
       if (newAppState === 'active') {
         const currentDate: DateString = formatDate(new Date())
-        const { dailyQuest: actualDailyQuest, history: actualHistory } = handleDayChange(dailyQuestRef.current, historyRef.current, currentDate)
+        const { dailyQuest: actualDailyQuest, history: actualHistory } = handleDayChange(
+          dailyQuestRef.current,
+          historyRef.current,
+          currentDate,
+        )
         dailyQuestRef.current = actualDailyQuest
         historyRef.current = actualHistory
         setDailyQuest(actualDailyQuest)
@@ -105,9 +117,7 @@ export default function App() {
   }, [isStorageLoaded])
 
   if (!fontsLoaded || !isStorageLoaded) {
-    return (
-      <LoadingScreen />
-    )
+    return <LoadingScreen />
   }
 
   return (
@@ -115,10 +125,10 @@ export default function App() {
       <ImageBackground
         source={require('./assets/background1.jpg')}
         style={styles.container}
-        resizeMode='cover'
+        resizeMode="cover"
       >
         <SafeAreaView style={styles.safeArea}>
-          {currentScreen === 'main' &&
+          {currentScreen === 'main' && (
             <MainScreen
               dailyQuest={dailyQuest}
               completeQuest={completeQuest}
@@ -126,16 +136,13 @@ export default function App() {
               onOpenHistory={() => setCurrentScreen('history')}
               canReplaceQuest={canReplaceQuest}
             />
-          }
-          {currentScreen === 'history' &&
-            <HistoryScreen
-              history={history}
-              onBack={() => setCurrentScreen('main')}
-            />
-          }
+          )}
+          {currentScreen === 'history' && (
+            <HistoryScreen history={history} onBack={() => setCurrentScreen('main')} />
+          )}
         </SafeAreaView>
         <StatusBar style="auto" />
       </ImageBackground>
     </SafeAreaProvider>
-  );
+  )
 }
