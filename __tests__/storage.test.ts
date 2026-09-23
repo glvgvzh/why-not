@@ -1,7 +1,7 @@
 import { setDailyQuestInStorage, getDailyQuestFromStorage } from '../storage/dailyQuestStorage'
 import { setHistoryInStorage, getHistoryFromStorage } from '../storage/historyStorage'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { formatDate } from '../utils/dailyQuest'
+import { DAILY_REPLACEMENT_LIMIT, formatDate } from '../utils/dailyQuest'
 import type { DailyQuest, HistoryItem } from '../types/quest'
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -33,6 +33,7 @@ describe('setDailyQuestInStorage', () => {
       },
       date: formatDate(new Date()),
       status: 'active',
+      replacementsLeft: DAILY_REPLACEMENT_LIMIT,
     }
 
     await setDailyQuestInStorage(dailyQuest)
@@ -66,6 +67,7 @@ describe('getDailyQuestFromStorage', () => {
         },
         date: '2026-09-11',
         status: 'completed',
+        replacementsLeft: DAILY_REPLACEMENT_LIMIT,
       },
     ]
     mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
@@ -100,6 +102,7 @@ describe('getDailyQuestFromStorage', () => {
       },
       date: formatDate(new Date()),
       status: 'active',
+      replacementsLeft: DAILY_REPLACEMENT_LIMIT,
     }
     mockedAsyncStorage.getItem.mockResolvedValue(JSON.stringify(savedDailyQuest))
     const result = await getDailyQuestFromStorage()
@@ -131,11 +134,28 @@ describe('getDailyQuestFromStorage', () => {
       },
       date: formatDate(new Date()),
       status: 'active',
+      replacementsLeft: DAILY_REPLACEMENT_LIMIT,
     }
     mockedAsyncStorage.getItem.mockResolvedValue(JSON.stringify(savedDailyQuest))
     const result = await getDailyQuestFromStorage()
 
     expect(result).toStrictEqual(savedDailyQuest)
+  })
+
+  test('returns valid DailyQuest from old format (without replacementsLeft) ', async () => {
+    const savedDailyQuest = {
+      quest: {
+        id: 2,
+        title: 'title2',
+        description: 'description2',
+      },
+      date: formatDate(new Date()),
+      status: 'active',
+    }
+    mockedAsyncStorage.getItem.mockResolvedValue(JSON.stringify(savedDailyQuest))
+    const result = await getDailyQuestFromStorage()
+
+    expect(result).toStrictEqual({ ...savedDailyQuest, replacementsLeft: DAILY_REPLACEMENT_LIMIT })
   })
 })
 
@@ -185,6 +205,7 @@ describe('getHistoryFromStorage', () => {
       },
       date: formatDate(new Date()),
       status: 'active',
+      replacementsLeft: DAILY_REPLACEMENT_LIMIT,
     }
     mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
       if (key === 'dailyQuest') {

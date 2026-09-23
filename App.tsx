@@ -13,7 +13,12 @@ import { useEffect, useRef, useState } from 'react'
 import { getDifferentQuest } from './utils/quest'
 import { quests } from './data/quests'
 import type { DailyQuest, DateString, HistoryItem, Quest } from './types/quest'
-import { formatDate, excludeClosedQuests, handleDayChange } from './utils/dailyQuest'
+import {
+  formatDate,
+  excludeClosedQuests,
+  handleDayChange,
+  DAILY_REPLACEMENT_LIMIT,
+} from './utils/dailyQuest'
 import { getDailyQuestFromStorage, setDailyQuestInStorage } from './storage/dailyQuestStorage'
 import { getHistoryFromStorage, setHistoryInStorage } from './storage/historyStorage'
 import MainScreen from './screens/MainScreen'
@@ -31,23 +36,36 @@ export default function App() {
     quest: quests[0],
     date: formatDate(new Date()),
     status: 'active',
+    replacementsLeft: DAILY_REPLACEMENT_LIMIT,
   })
   const [isStorageLoaded, setIsStorageLoaded] = useState(false)
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [currentScreen, setCurrentScreen] = useState<'main' | 'history'>('main')
 
   const availableQuests: Quest[] = excludeClosedQuests(quests, history)
-  const canReplaceQuest: boolean = availableQuests.some((quest) => quest.id !== dailyQuest.quest.id)
+  const canReplaceQuest: boolean =
+    availableQuests.some((quest) => quest.id !== dailyQuest.quest.id) &&
+    dailyQuest.replacementsLeft > 0
 
   function changeQuest(): void {
+    if (dailyQuest.replacementsLeft === 0) return
     const newQuest = getDifferentQuest(availableQuests, dailyQuest.quest)
     if (newQuest === null) return
-    setDailyQuest({ ...dailyQuest, quest: newQuest })
+    setDailyQuest((prev) => {
+      if (prev.replacementsLeft === 0) return prev
+      return {
+        ...prev,
+        quest: newQuest,
+        replacementsLeft: prev.replacementsLeft - 1,
+      }
+    })
   }
 
   function completeQuest(): void {
     const completedDailyQuest: DailyQuest = { ...dailyQuest, status: 'completed' }
-    const updatedHistory: HistoryItem[] = [...history, completedDailyQuest]
+    const { replacementsLeft, ...baseData } = completedDailyQuest
+    const completedHistoryItem: HistoryItem = { ...baseData, status: 'completed' }
+    const updatedHistory: HistoryItem[] = [...history, completedHistoryItem]
     setDailyQuest(completedDailyQuest)
     setHistory(updatedHistory)
   }

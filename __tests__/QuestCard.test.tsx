@@ -12,6 +12,7 @@ describe('QuestCard', () => {
       },
       date: '2026-09-09',
       status: 'completed',
+      replacementsLeft: 1,
     }
     const { getByText, queryByText } = await render(
       <QuestCard
@@ -36,6 +37,7 @@ describe('QuestCard', () => {
       },
       date: '2026-09-09',
       status: 'active',
+      replacementsLeft: 1,
     }
     const completeQuest = jest.fn()
     const { getByText } = await render(
@@ -60,6 +62,7 @@ describe('QuestCard', () => {
       },
       date: '2026-09-09',
       status: 'active',
+      replacementsLeft: 1,
     }
     const changeQuest = jest.fn()
     const { getByText } = await render(
@@ -84,6 +87,7 @@ describe('QuestCard', () => {
       },
       date: '2026-09-09',
       status: 'active',
+      replacementsLeft: 1,
     }
     const { getByText, queryByText } = await render(
       <QuestCard
@@ -106,6 +110,7 @@ describe('QuestCard', () => {
       },
       date: '2026-09-09',
       status: 'active',
+      replacementsLeft: 1,
     }
     const { getByText, queryByText, getByTestId } = await render(
       <QuestCard

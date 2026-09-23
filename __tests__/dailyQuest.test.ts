@@ -1,4 +1,4 @@
-import type { DateString, DailyQuest, Quest, HistoryItem } from '../types/quest'
+import type { DateString, DailyQuest, Quest, HistoryItem, BaseQuestData } from '../types/quest'
 import {
   isDateChanged,
   formatDate,
@@ -47,8 +47,9 @@ describe('finalizeDailyQuest', () => {
       },
       date: '2026-08-30',
       status: 'active',
+      replacementsLeft: 1,
     }
-    const changedQuest: DailyQuest = finalizeDailyQuest(dailyQuest)
+    const changedQuest: BaseQuestData = finalizeDailyQuest(dailyQuest)
 
     expect(changedQuest.status).toBe('missed')
   })
@@ -62,8 +63,9 @@ describe('finalizeDailyQuest', () => {
       },
       date: '2026-08-30',
       status: 'completed',
+      replacementsLeft: 1,
     }
-    const changedQuest: DailyQuest = finalizeDailyQuest(dailyQuest)
+    const changedQuest: BaseQuestData = finalizeDailyQuest(dailyQuest)
 
     expect(changedQuest.status).toBe('completed')
   })
@@ -77,8 +79,9 @@ describe('finalizeDailyQuest', () => {
       },
       date: '2026-08-30',
       status: 'missed',
+      replacementsLeft: 1,
     }
-    const changedQuest: DailyQuest = finalizeDailyQuest(dailyQuest)
+    const changedQuest: BaseQuestData = finalizeDailyQuest(dailyQuest)
 
     expect(changedQuest.status).toBe('missed')
   })
@@ -314,6 +317,7 @@ describe('handleDayChange', () => {
       },
       date: '2026-09-17',
       status: 'active',
+      replacementsLeft: 1,
     }
     const history: HistoryItem[] = [
       {
@@ -341,6 +345,7 @@ describe('handleDayChange', () => {
       },
       date: '2026-09-17',
       status: 'active',
+      replacementsLeft: 1,
     }
     const history: HistoryItem[] = [
       {
@@ -357,7 +362,10 @@ describe('handleDayChange', () => {
     const result = handleDayChange(dailyQuest, history, currentDate)
     expect(result.dailyQuest.date).toBe('2026-09-18')
     expect(result.dailyQuest.status).toBe('active')
-    expect(result.history).toStrictEqual([...history, { ...dailyQuest, status: 'missed' }])
+    expect(result.history).toStrictEqual([
+      ...history,
+      { quest: dailyQuest.quest, date: dailyQuest.date, status: 'missed' },
+    ])
   })
 
   test('returns new dailyQuest & new missed days in history if a few days have passed', () => {
@@ -369,6 +377,7 @@ describe('handleDayChange', () => {
       },
       date: '2026-09-17',
       status: 'active',
+      replacementsLeft: 1,
     }
     const history: HistoryItem[] = [
       {
@@ -388,7 +397,8 @@ describe('handleDayChange', () => {
     expect(result.history).toStrictEqual([
       ...history,
       {
-        ...dailyQuest,
+        quest: dailyQuest.quest,
+        date: dailyQuest.date,
         status: 'missed',
       },
       {
@@ -411,6 +421,7 @@ describe('handleDayChange', () => {
       },
       date: '2026-09-17',
       status: 'completed',
+      replacementsLeft: 1,
     }
     const history: HistoryItem[] = [
       {
@@ -448,6 +459,7 @@ describe('handleDayChange', () => {
       },
       date: '2026-09-17',
       status: 'completed',
+      replacementsLeft: 1,
     }
     const history: HistoryItem[] = [
       {
@@ -473,6 +485,7 @@ describe('handleDayChange', () => {
       },
       date: '2026-09-29',
       status: 'active',
+      replacementsLeft: 1,
     }
     const history: HistoryItem[] = []
     const currentDate: DateString = '2026-10-02'
@@ -510,6 +523,7 @@ describe('handleDayChange', () => {
       },
       date: '2026-12-29',
       status: 'active',
+      replacementsLeft: 1,
     }
     const history: HistoryItem[] = []
     const currentDate: DateString = '2027-01-02'
