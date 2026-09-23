@@ -1,25 +1,25 @@
 export type Quest = {
-  id: number;
-  title: string;
-  description: string;
+  id: number
+  title: string
+  description: string
 }
 
 export type DateString = `${number}-${number}-${number}`
 
 export type DailyQuest = {
-  quest: Quest;
-  date: DateString;
-  status: 'active' | 'completed' | 'missed';
+  quest: Quest
+  date: DateString
+  status: 'active' | 'completed' | 'missed'
 }
 
 export type MissedDay = {
-  date: DateString;
-  status: 'missed';
+  date: DateString
+  status: 'missed'
 }
 
 export type DayChangeResult = {
-  dailyQuest: DailyQuest;
-  history: HistoryItem[];
+  dailyQuest: DailyQuest
+  history: HistoryItem[]
 }
 
 export type HistoryItem = DailyQuest | MissedDay

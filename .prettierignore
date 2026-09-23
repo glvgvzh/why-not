@@ -1,0 +1,7 @@
+package-lock.json
+node_modules
+.expo
+.claude
+AGENTS.md
+CLAUDE.md
+rules.md
