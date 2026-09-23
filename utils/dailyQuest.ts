@@ -1,6 +1,15 @@
-import type { DateString, DailyQuest, Quest, HistoryItem, DayChangeResult } from '../types/quest'
+import type {
+  DateString,
+  DailyQuest,
+  Quest,
+  HistoryItem,
+  DayChangeResult,
+  BaseQuestData,
+} from '../types/quest'
 import { quests } from '../data/quests'
 import { selectQuestForNewDay } from './quest'
+
+export const DAILY_REPLACEMENT_LIMIT: number = 1
 
 export function isDateChanged(dailyQuestDate: DateString, currentDate: DateString): boolean {
   return dailyQuestDate !== currentDate
@@ -18,11 +27,12 @@ export function formatDateForUI(date: DateString): string {
   return `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`
 }
 
-export function finalizeDailyQuest(dailyQuest: DailyQuest): DailyQuest {
+export function finalizeDailyQuest(dailyQuest: DailyQuest): BaseQuestData {
+  const { replacementsLeft, ...baseData } = dailyQuest
   if (dailyQuest.status === 'active') {
-    return { ...dailyQuest, status: 'missed' }
+    return { ...baseData, status: 'missed' }
   }
-  return dailyQuest
+  return baseData
 }
 
 export function excludeClosedQuests(quests: Quest[], history: HistoryItem[]): Quest[] {
@@ -61,7 +71,7 @@ export function handleDayChange(
   let actualHistory: HistoryItem[] = [...history]
 
   if (dailyQuest.status === 'active') {
-    const finalizedDailyQuest: DailyQuest = finalizeDailyQuest(dailyQuest)
+    const finalizedDailyQuest: BaseQuestData = finalizeDailyQuest(dailyQuest)
     if (!actualHistory.some((historyItem) => historyItem.date === finalizedDailyQuest.date)) {
       actualHistory = [...actualHistory, finalizedDailyQuest]
     }
@@ -82,6 +92,7 @@ export function handleDayChange(
       quest: newQuest,
       date: currentDate,
       status: 'active',
+      replacementsLeft: DAILY_REPLACEMENT_LIMIT,
     },
     history: actualHistory,
   }

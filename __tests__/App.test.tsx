@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import App from '../App'
 import { render, waitFor, fireEvent } from '@testing-library/react-native'
 import type { DailyQuest, HistoryItem } from '../types/quest'
-import { formatDate } from '../utils/dailyQuest'
+import { DAILY_REPLACEMENT_LIMIT, formatDate } from '../utils/dailyQuest'
 import { AppState } from 'react-native'
 
 jest.mock('@expo-google-fonts/manrope', () => ({
@@ -66,6 +66,7 @@ describe('App', () => {
       },
       date: formatDate(new Date()),
       status: 'active',
+      replacementsLeft: 1,
     }
     const savedHistory: HistoryItem[] = [
       {
@@ -109,6 +110,7 @@ describe('App', () => {
       },
       date: formatDate(new Date()),
       status: 'completed',
+      replacementsLeft: 1,
     }
     const savedHistory: HistoryItem[] = [
       {
@@ -230,6 +232,7 @@ describe('App', () => {
       },
       date: formatDate(new Date()),
       status: 'active',
+      replacementsLeft: 1,
     }
     const savedHistory: HistoryItem[] = []
     mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
@@ -270,6 +273,7 @@ describe('App', () => {
       },
       date: formatDate(new Date()),
       status: 'active',
+      replacementsLeft: 1,
     }
     const savedHistory: HistoryItem[] = []
     mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
@@ -292,8 +296,132 @@ describe('App', () => {
       )
       expect(mockedAsyncStorage.setItem).toHaveBeenCalledWith(
         'history',
-        JSON.stringify([{ ...savedDailyQuest, status: 'completed' }]),
+        JSON.stringify([
+          { quest: savedDailyQuest.quest, date: savedDailyQuest.date, status: 'completed' },
+        ]),
       )
+    })
+  })
+
+  test('decreases replacementsLeft after successful quest replacement', async () => {
+    const savedDailyQuest: DailyQuest = {
+      quest: {
+        id: 1,
+        title: 'title1',
+        description: 'description1',
+      },
+      date: formatDate(new Date()),
+      status: 'active',
+      replacementsLeft: 1,
+    }
+
+    mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
+      if (key === 'dailyQuest') {
+        return JSON.stringify(savedDailyQuest)
+      }
+      return null
+    })
+
+    const { findByText } = await render(<App />)
+
+    fireEvent.press(await findByText('Заменить'))
+    await waitFor(() => {
+      expect(mockedAsyncStorage.setItem).toHaveBeenCalledWith(
+        'dailyQuest',
+        expect.stringContaining('"replacementsLeft":0'),
+      )
+    })
+  })
+
+  test('disables quest replacement after replacement attempt is used', async () => {
+    const savedDailyQuest: DailyQuest = {
+      quest: {
+        id: 1,
+        title: 'title1',
+        description: 'description1',
+      },
+      date: formatDate(new Date()),
+      status: 'active',
+      replacementsLeft: 1,
+    }
+
+    mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
+      if (key === 'dailyQuest') {
+        return JSON.stringify(savedDailyQuest)
+      }
+      return null
+    })
+
+    const { findByText, queryByText, getByText, getByTestId } = await render(<App />)
+
+    fireEvent.press(await findByText('Заменить'))
+    await waitFor(() => {
+      expect(mockedAsyncStorage.setItem).toHaveBeenCalledWith(
+        'dailyQuest',
+        expect.stringContaining('"replacementsLeft":0'),
+      )
+      expect(queryByText('Заменить')).toBeNull()
+      expect(getByText('Нет доступных квестов')).toBeTruthy()
+      expect(getByTestId('changeButton')).toBeDisabled()
+    })
+  })
+
+  test('restores used replacement limit after app restart', async () => {
+    const savedDailyQuest: DailyQuest = {
+      quest: {
+        id: 1,
+        title: 'title1',
+        description: 'description1',
+      },
+      date: formatDate(new Date()),
+      status: 'active',
+      replacementsLeft: 0,
+    }
+
+    mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
+      if (key === 'dailyQuest') {
+        return JSON.stringify(savedDailyQuest)
+      }
+      return null
+    })
+
+    const { queryByText, getByText, getByTestId } = await render(<App />)
+
+    await waitFor(() => {
+      expect(queryByText('Заменить')).toBeNull()
+      expect(getByText('Нет доступных квестов')).toBeTruthy()
+      expect(getByTestId('changeButton')).toBeDisabled()
+    })
+  })
+
+  test('resets replacement limit on a new day', async () => {
+    const savedDailyQuest: DailyQuest = {
+      quest: {
+        id: 1,
+        title: 'title1',
+        description: 'description1',
+      },
+      date: '2026-09-22',
+      status: 'active',
+      replacementsLeft: 0,
+    }
+
+    mockedAsyncStorage.getItem.mockImplementation(async (key: string) => {
+      if (key === 'dailyQuest') {
+        return JSON.stringify(savedDailyQuest)
+      }
+      return null
+    })
+
+    const { getByText, getByTestId } = await render(<App />)
+
+    await waitFor(() => {
+      expect(mockedAsyncStorage.setItem).toHaveBeenCalledWith(
+        'dailyQuest',
+        expect.stringContaining(`"replacementsLeft":${DAILY_REPLACEMENT_LIMIT}`),
+      )
+      expect(getByText('Заменить')).toBeTruthy()
+      expect(getByTestId('changeButton')).toBeEnabled()
     })
   })
 })

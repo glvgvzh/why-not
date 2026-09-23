@@ -1,36 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import type { HistoryItem } from '../types/quest'
-import { isDailyQuest } from './dailyQuestStorage'
+import { isHistory, HistoryItem } from '../types/quest'
 
 const HISTORY_STORAGE_KEY = 'history'
-
-function isHistoryItem(value: unknown): value is HistoryItem {
-  if (typeof value !== 'object' || value === null) {
-    return false
-  }
-  if ('quest' in value) {
-    return isDailyQuest(value)
-  }
-  if (!('date' in value) || !('status' in value)) {
-    return false
-  }
-  if (typeof value.date !== 'string' || typeof value.status !== 'string') {
-    return false
-  }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value.date) || value.status !== 'missed') {
-    return false
-  }
-
-  return true
-}
-
-function isHistory(value: unknown): value is HistoryItem[] {
-  if (!Array.isArray(value)) {
-    return false
-  }
-
-  return value.every((item) => isHistoryItem(item))
-}
 
 export async function setHistoryInStorage(history: HistoryItem[]): Promise<void> {
   try {
